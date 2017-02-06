@@ -89,8 +89,8 @@ Object makePeluru(int xinit, int yinit) {
 }
 
 Object makePesawat(int xinit, int yinit) {
-	int x[22] = {0, 16, 81, 125, 134, 110, 112, 154, 167, 176, 169, 169, 176, 167, 154, 112, 110, 134, 125, 81, 16, 0};
-	int y[22] = {3, 11, 11, 57, 57, 21, 11, 9, 28, 28, 11, -11, -28, -28, -9, -11, -21, -57, -57, -11, -11, -3};
+	int x[22] = {0, 16, 81, 125, 134, 110, 112, 154, 167, 176, 169, 169, 176, 167, 154, 112, 110, 134, 125,  81,  16, 0};
+	int y[22] = {3, 11, 11, 57 , 57 , 21 , 11 , 9  , 28 , 28 , 11 , -11, -28, -28, -9 , -11, -21, -57, -57, -11, -11, -3};
 	Object O;
 	for(int i = 0;i < 22;i++) {
 		O.P[i].x = x[i];
@@ -103,6 +103,56 @@ Object makePesawat(int xinit, int yinit) {
 	O.nlingkaran = 0;
 	return O;
 }
+
+Object makeLedakanPesawat1(int xinit, int yinit) {
+	int x[22] = {0, 16, 75,  81,  16, 0};
+	int y[22] = {3, 11, 11, -11, -11, -3};
+	Object O;
+	for(int i = 0;i < 22;i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
+	}
+
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = 22;
+	O.nlingkaran = 0;
+	return O;
+}
+
+Object makeLedakanPesawat2(int xinit, int yinit) {
+	int x[22] = {0, 44 , 53 , 29 , 31 , 5};
+	int y[22] = {0, 46 , 46 , 10 , 0  , -25};
+	Object O;
+	for(int i = 0;i < 6;i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
+	}
+
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = 22;
+	O.nlingkaran = 0;
+	return O;
+}
+
+Object makeLedakanPesawat3(int xinit, int yinit) {
+	int x[22] = {0, 42, 55, 64, 57, 57, 64, 55, 42, 0, -2, 22, 13,  -31};
+	int y[22] = {0, -2  , 17 , 17 , 0 , -22, -39, -39, -20 , -22, -32, -68, -68, -22};
+	Object O;
+	for(int i = 0;i < 22;i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
+	}
+
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = 22;
+	O.nlingkaran = 0;
+	return O;
+}
+
+
 
 Object makeLedakan(int xinit, int yinit) {
 	int x[20] = {0, 20, 46, 40, 84, 54, 86, 51, 72, 29, 28, 4, -34, -19, -60, -22, -67, -21, -47, -4};

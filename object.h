@@ -22,5 +22,8 @@ int isObjectCollide(Object O, Matrix* M, char c);
 Object makePeluru(int xinit, int yinit);
 Object makePesawat(int xinit, int yinit);
 Object makeLedakan(int xinit, int yinit);
+Object makeLedakanPesawat1(int xinit, int yinit);
+Object makeLedakanPesawat2(int xinit, int yinit);
+Object makeLedakanPesawat3(int xinit, int yinit);
 Object makeMeriam(int xinitA, int yinitA);
 #endif
