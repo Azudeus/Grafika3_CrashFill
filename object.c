@@ -37,8 +37,8 @@ void rotateCounterClockwise(Object* O, int x) {
 	float s = -sin(angle);
 	float c = cos(angle);
 
-	int px;
-	int py;
+	float px;
+	float py;
 	for (int i=0 ;i<O->size ;i++) {
 		px = O->P[i].x;
 		py = O->P[i].y;
