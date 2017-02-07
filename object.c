@@ -17,6 +17,36 @@ void moveHorizontal(Object* O, int x) {
 	O->pointInit.x = O->pointInit.x + x;
 }
 
+void rotateClockwise(Object* O, int x) {
+	float angle = x*PI/180;
+	float s = sin(angle);
+	float c = cos(angle);
+
+	int px;
+	int py;
+	for (int i=0 ;i < O->size-1 ;i++) {
+		px = O->P[i].x;
+		py = O->P[i].y;
+		O->P[i].x = (int) round((px * c) - (py * s));
+		O->P[i].y = (int) round((px * s) + (py * c));		
+	}
+}
+
+void rotateCounterClockwise(Object* O, int x) {
+	float angle = x*PI/180;
+	float s = -sin(angle);
+	float c = cos(angle);
+	int px;
+	int py;
+	for (int i=0;i<O->size-1;i++) {
+		px = O->P[i].x;
+		py = O->P[i].y;
+		O->P[i].x = (int) round((px * c) - (py * s));
+		O->P[i].y = (int) round((px * s) + (py * c));		
+	}
+}
+
+
 int isOut(Object* O,int rangex, int rangey) {
 	if ((O->pointInit.x<=rangex)||(O->pointInit.y<=rangey)){
 		return 1;
@@ -105,24 +135,24 @@ Object makePesawat(int xinit, int yinit) {
 }
 
 Object makeLedakanPesawat1(int xinit, int yinit) {
-	int x[22] = {0, 16, 75,  81,  16, 0};
-	int y[22] = {3, 11, 11, -11, -11, -3};
+	int x[6] = {0, 16, 75,  81,  16, 0};
+	int y[6] = {3, 11, 11, -11, -11, -3};
 	Object O;
-	for(int i = 0;i < 22;i++) {
+	for(int i = 0;i < 6;i++) {
 		O.P[i].x = x[i];
 		O.P[i].y = y[i];
 	}
 
 	O.pointInit.x = xinit;
 	O.pointInit.y = yinit;
-	O.size = 22;
+	O.size = 6;
 	O.nlingkaran = 0;
 	return O;
 }
 
 Object makeLedakanPesawat2(int xinit, int yinit) {
-	int x[22] = {0, 44 , 53 , 29 , 31 , 5};
-	int y[22] = {0, 46 , 46 , 10 , 0  , -25};
+	int x[6] = {0, 44 , 53 , 29 , 31 , 5};
+	int y[6] = {0, 46 , 46 , 10 , 0  , -25};
 	Object O;
 	for(int i = 0;i < 6;i++) {
 		O.P[i].x = x[i];
@@ -137,17 +167,17 @@ Object makeLedakanPesawat2(int xinit, int yinit) {
 }
 
 Object makeLedakanPesawat3(int xinit, int yinit) {
-	int x[22] = {0, 42, 55, 64, 57, 57, 64, 55, 42, 0, -2, 22, 13,  -31};
-	int y[22] = {0, -2  , 17 , 17 , 0 , -22, -39, -39, -20 , -22, -32, -68, -68, -22};
+	int x[14] = {0, 42, 55, 64, 57, 57, 64, 55, 42, 0, -2, 22, 13,  -31};
+	int y[14] = {0, -2  , 17 , 17 , 0 , -22, -39, -39, -20 , -22, -32, -68, -68, -22};
 	Object O;
-	for(int i = 0;i < 22;i++) {
+	for(int i = 0;i < 14;i++) {
 		O.P[i].x = x[i];
 		O.P[i].y = y[i];
 	}
 
 	O.pointInit.x = xinit;
 	O.pointInit.y = yinit;
-	O.size = 22;
+	O.size = 14;
 	O.nlingkaran = 0;
 	return O;
 }
