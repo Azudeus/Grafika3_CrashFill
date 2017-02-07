@@ -6,6 +6,7 @@
 #include <linux/fb.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
+#include <math.h>
 
 #include "lingkaran.h"
 #include "matrix.h"
@@ -101,17 +102,23 @@ int main(){
 	Matrix M;
 	Point P1, P2;
 	Lingkaran L;
-	char c1, c2, c3, c4;
+	char c1, c2, c3, c4, c5, c6, c7;
 	c1 = '1';
 	c2 = '2';
 	c3 = '3';
 	c4 = '4';
+	c5 = '5';
+	c6 = '6';
+	c7 = '7';
 	initMatrix(&M, 1200, 700);
 	resetMatrix(&M);
 
 	Object pesawat = makePesawat(950,100);
 	Object ledakan = makeLedakan(1500,100);
 	Object meriam = makeMeriam(600,750);
+	Object ledakan1;
+	Object ledakan2;
+	Object ledakan3;
 
 	gambarObject(pesawat, &M, c1);
     gambarObject(meriam, &M, c3);
@@ -150,7 +157,7 @@ int main(){
 		moveHorizontal(&pesawat,-2);
 		int j;
 		for (j = 0; j < nBullets; ++j) {
-			moveVertical(&bullets[j], -2);
+			moveVertical(&bullets[j], -3);
 		}
 		resetMatrix(&M);
 		gambarObject(pesawat, &M, c1);
@@ -188,32 +195,50 @@ int main(){
 		if (isObjectCollide(pesawat, &M, c1) == 1) {
 			ledakan = makeLedakan(550,100);
 			pesawat = makePesawat(1500,100);
+			ledakan1 = makeLedakanPesawat1(550,100);
+			ledakan2 = makeLedakanPesawat2(550,100);
+			ledakan3 = makeLedakanPesawat3(550,100);
 			collide = 1;
-			
-			//what to do next
-			resetMatrix(&M);
-			gambarObject(pesawat, &M, c1);
-			gambarObject(meriam, &M, c3);
-			gambarObject(ledakan, &M, c4);
-			for (j = 0; j < nBullets; ++j) {
-				gambarObject(bullets[j], &M, c2);
-			}
-			for (y = 0; y < 700; y++) {
-				for (x = 0; x < 1200; x++) {
-					location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-							   (y+vinfo.yoffset) * finfo.line_length;
 
-					if (vinfo.bits_per_pixel == 32) {
-						*(fbp + location) = M.M[y][x];        // Some blue
-						*(fbp + location + 1) = M.M[y][x]; //15+(x-100)/2;     // A little green
-						*(fbp + location + 2) = M.M[y][x]; //200-(y-100)/5;    // A lot of red
-						*(fbp + location + 3) = 0;      // No transparency
-					} else  { //assume 16bpp
-						int b = 10;
-						int g = (x-100)/6;     // A little green
-						int r = 31-(y-100)/16;    // A lot of red
-						unsigned short int t = r<<11 | g << 5 | b;
-						*((unsigned short int*)(fbp + location)) = t;
+			int dx = 0;
+			while(dx<150){
+				dx++;
+				moveHorizontal(&ledakan1,-3);
+				moveVertical(&ledakan1,((dx*dx)+2*dx)/1000);
+				rotateCounterClockwise(&ledakan1,15);
+
+				moveHorizontal(&ledakan2,2);
+				moveVertical(&ledakan2,((dx*dx)+2*dx)/1500);
+				rotateClockwise(&ledakan2,5);
+
+				moveHorizontal(&ledakan3,5);
+				moveVertical(&ledakan3,((dx*dx)+2*dx)/1200);
+				rotateClockwise(&ledakan3,10);
+
+				resetMatrix(&M);
+				gambarObject(meriam, &M, c3);
+				gambarObject(ledakan, &M, c4);
+				gambarObject(ledakan1, &M, c5);
+				gambarObject(ledakan2, &M, c5);
+				gambarObject(ledakan3, &M, c5);
+
+				for (y = 0; y < 700; y++) {
+					for (x = 0; x < 1200; x++) {
+						location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+								   (y+vinfo.yoffset) * finfo.line_length;
+
+						if (vinfo.bits_per_pixel == 32) {
+							*(fbp + location) = M.M[y][x];        // Some blue
+							*(fbp + location + 1) = M.M[y][x]; //15+(x-100)/2;     // A little green
+							*(fbp + location + 2) = M.M[y][x]; //200-(y-100)/5;    // A lot of red
+							*(fbp + location + 3) = 0;      // No transparency
+						} else  { //assume 16bpp
+							int b = 10;
+							int g = (x-100)/6;     // A little green
+							int r = 31-(y-100)/16;    // A lot of red
+							unsigned short int t = r<<11 | g << 5 | b;
+							*((unsigned short int*)(fbp + location)) = t;
+						}
 					}
 				}
 			}
