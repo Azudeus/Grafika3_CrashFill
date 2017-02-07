@@ -7,6 +7,7 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <math.h>
+#include <time.h>
 
 #include "lingkaran.h"
 #include "matrix.h"
@@ -283,7 +284,7 @@ int main(){
 			collide = 1;
 
 			int dx = 0;
-			while(dx<150){
+			while(isOut(&ledakan2,0,1000)){
 				dx++;
 				moveHorizontal(&ledakan1,-3);
 				moveVertical(&ledakan1,((dx*dx)+2*dx)/1000);
