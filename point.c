@@ -31,7 +31,7 @@ int isGarisPutus(Point P1, Point P2, Matrix* M, char c) {
 		int err = (dx>dy ? dx : -dy)/2, e2;
 		for(;ret == 0;) {
             if(P1.x >= 0 && P1.y >= 0 && P1.x < M->xsize && P1.y < M->ysize) {
-                if (M->M[P1.y][P1.x] != c) {
+                if (M->M[(int)P1.y][(int)P1.x] != c) {
                     ret=1;
                 }
             }
@@ -46,7 +46,7 @@ int isGarisPutus(Point P1, Point P2, Matrix* M, char c) {
 		int finish = max(P1.y, P2.y);
 		for(int i = start;i <= finish && ret == 0;i++) {
 			if(P1.x >= 0 && i >= 0 && P1.x < M->xsize && i < M->ysize) {
-                if (M->M[i][P1.x] != c) {
+                if (M->M[i][(int)P1.x] != c) {
                     ret = 1;
                 }
             }

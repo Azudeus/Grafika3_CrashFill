@@ -22,13 +22,13 @@ void rotateClockwise(Object* O, int x) {
 	float s = sin(angle);
 	float c = cos(angle);
 
-	int px;
-	int py;
-	for (int i=0 ;i < O->size-1 ;i++) {
+	float px;
+	float py;
+	for (int i=0 ;i < O->size ;i++) {
 		px = O->P[i].x;
 		py = O->P[i].y;
-		O->P[i].x = (int) round((px * c) - (py * s));
-		O->P[i].y = (int) round((px * s) + (py * c));		
+		O->P[i].x = (px * c) - (py * s);
+		O->P[i].y = (px * s) + (py * c);		
 	}
 }
 
@@ -36,9 +36,10 @@ void rotateCounterClockwise(Object* O, int x) {
 	float angle = x*PI/180;
 	float s = -sin(angle);
 	float c = cos(angle);
+
 	int px;
 	int py;
-	for (int i=0;i<O->size-1;i++) {
+	for (int i=0 ;i<O->size ;i++) {
 		px = O->P[i].x;
 		py = O->P[i].y;
 		O->P[i].x = (int) round((px * c) - (py * s));
@@ -59,13 +60,13 @@ int isOut(Object* O,int rangex, int rangey) {
 void gambarObject(Object O, Matrix* M, char c) {
 	Point start, finish;
 	for(int i = 0;i < O.size-1 ;i++) {
-		setXY(&start, O.P[i].x + O.pointInit.x, O.P[i].y + O.pointInit.y);
-		setXY(&finish, O.P[i+1].x + O.pointInit.x, O.P[i+1].y + O.pointInit.y);
+		setXY(&start, (int)O.P[i].x + O.pointInit.x, (int)O.P[i].y + O.pointInit.y);
+		setXY(&finish, (int)O.P[i+1].x + O.pointInit.x, (int)O.P[i+1].y + O.pointInit.y);
 		gambarGaris(start, finish, M, c);
 	}
 
-	setXY(&start, O.P[O.size - 1].x + O.pointInit.x, O.P[O.size - 1].y + O.pointInit.y);
-	setXY(&finish, O.P[0].x + O.pointInit.x, O.P[0].y + O.pointInit.y);
+	setXY(&start, (int)O.P[O.size - 1].x + O.pointInit.x, (int)O.P[O.size - 1].y + O.pointInit.y);
+	setXY(&finish, (int)O.P[0].x + O.pointInit.x, (int)O.P[0].y + O.pointInit.y);
 	gambarGaris(start, finish, M, c);
 
 	for(int i = 0;i < O.nlingkaran ;i++) {
@@ -161,7 +162,7 @@ Object makeLedakanPesawat2(int xinit, int yinit) {
 
 	O.pointInit.x = xinit;
 	O.pointInit.y = yinit;
-	O.size = 22;
+	O.size = 6;
 	O.nlingkaran = 0;
 	return O;
 }
