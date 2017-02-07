@@ -23,18 +23,19 @@ Object bullets[20];
 void *get_keypress(void *x_void_ptr)
 {
 	while (end == 1) {
-		c = getchar();
+		c = getchar();		
 	}
 }
 
 void *make_bullets(void *x_void_ptr) {
 	while (end == 1) {
-		if (c == 'p') {
+		if (c == '\n') {
 			bullets[nBullets] = makePeluru(600,500);
 			++nBullets;
 			if (nBullets >= 19) {
 				nBullets = 0;
 			}
+			c = 'p';
 		}
 	}
 }
