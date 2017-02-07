@@ -20,6 +20,90 @@ int end = 1;
 int nBullets = 0;
 Object bullets[20];
  
+char *fbp = 0;
+int fbfd = 0;
+struct fb_var_screeninfo vinfo;
+struct fb_fix_screeninfo finfo;
+long int screensize = 0;
+long location;
+struct timespec tim; 
+ 
+#define RED 1
+#define BLACK 2
+#define WHITE 3
+#define GREEN 4
+#define BLUE 5
+
+void fillColor(int color) {
+	if(color == RED) {
+		*(fbp + location) = 0; 
+		*(fbp + location + 1) = 0;   
+		*(fbp + location + 2) = 255;   
+		*(fbp + location + 3) = 0;  
+	}
+	else if(color == BLACK) {
+		*(fbp + location) = 0; 
+		*(fbp + location + 1) = 0; 
+		*(fbp + location + 2) = 0; 
+		*(fbp + location + 3) = 0;   					
+	}
+	else if(color == GREEN) {
+		*(fbp + location) = 0;    
+		*(fbp + location + 1) = 255; 
+		*(fbp + location + 2) = 0; 
+		*(fbp + location + 3) = 0; 
+	} 
+	else if(color == WHITE) {
+		*(fbp + location) = 255; 
+		*(fbp + location + 1) = 255;  
+		*(fbp + location + 2) = 255;
+		*(fbp + location + 3) = 0; 
+	}
+	else if(color == BLUE) {
+		*(fbp + location) = 255; 
+		*(fbp + location + 1) = 0;  
+		*(fbp + location + 2) = 0;
+		*(fbp + location + 3) = 50; 
+	}
+}
+ 
+void fill(int x, int y, int color) 
+{
+	int tempX, tempY;
+	
+	tempX = x+1; tempY = y;
+	location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+               (tempY+vinfo.yoffset) * finfo.line_length;
+    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
+		fillColor(color);
+		fill(tempX, tempY, color);
+	}
+		
+	tempX = x-1; tempY = y;
+	location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+               (tempY+vinfo.yoffset) * finfo.line_length;
+    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
+		fillColor(color);
+		fill(tempX, tempY, color);
+	}
+	
+	tempX = x; tempY = y+1;
+	location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+               (tempY+vinfo.yoffset) * finfo.line_length;
+    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
+		fillColor(color);
+		fill(tempX, tempY, color);
+	}
+	
+	tempX = x; tempY = y-1;
+	location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+               (tempY+vinfo.yoffset) * finfo.line_length;
+    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
+		fillColor(color);
+		fill(tempX, tempY, color);
+	}
+} 
+ 
 void *get_keypress(void *x_void_ptr)
 {
 	while (end == 1) {
@@ -41,13 +125,7 @@ void *make_bullets(void *x_void_ptr) {
 }
 
 int main(){
-    int fbfd = 0;
-    struct fb_var_screeninfo vinfo;
-    struct fb_fix_screeninfo finfo;
-    long int screensize = 0;
-    char *fbp = 0;
    	int x = 0, y = 0;
-    long int location = 0;
 	
 	// Open the file for reading and writing
     fbfd = open("/dev/fb0", O_RDWR);
@@ -152,13 +230,13 @@ int main(){
 
 //---------------
 	int collide = 0;
-	
+	int xPesawat = 1100;
 	//the main display, game ends when bullet collides with plane
 	do {
-		moveHorizontal(&pesawat,-2);
+		moveHorizontal(&pesawat,-10);
 		int j;
 		for (j = 0; j < nBullets; ++j) {
-			moveVertical(&bullets[j], -3);
+			moveVertical(&bullets[j], -15);
 		}
 		resetMatrix(&M);
 		gambarObject(pesawat, &M, c1);
@@ -186,10 +264,13 @@ int main(){
 				}
 			}
 		}
+		xPesawat -= 10;
+		fill (xPesawat, 100, WHITE); // pesawat
 		
 		//check if plane is out of screen
 		if (isOut(&pesawat,-300,0)){
     		moveHorizontal(&pesawat,1500);
+    		xPesawat = 1300;
     	}
 		
 		//check collide condition
@@ -244,6 +325,13 @@ int main(){
 				}
 			}
 		}
+		fill (600, 700, RED);	// meriam bawah
+		fill (600, 680, GREEN);	// meriam atas
+		fill (600, 620, BLUE);	// meriam persegi panjang
+		
+		tim.tv_sec = 0;
+		tim.tv_nsec = 100000000;
+		nanosleep(&tim, NULL);
 	} while (collide == 0);
 
     //closing connection
