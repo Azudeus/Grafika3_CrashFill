@@ -4,6 +4,8 @@
 #include "lingkaran.h"
 #include "matrix.h"
 
+#define PI 3.14159265
+
 typedef struct
 {
 	Point pointInit;
@@ -16,6 +18,8 @@ typedef struct
 void setXYObject(Object* O, int x, int y);
 void moveVertical(Object* O, int y);
 void moveHorizontal(Object* O, int x);
+void rotateClockwise(Object* O, int angle);
+void rotateCounterClockwise(Object* O, int angle);
 int isOut(Object *O, int rangex, int rangey);
 void gambarObject(Object O, Matrix* M, char c);
 int isObjectCollide(Object O, Matrix* M, char c);

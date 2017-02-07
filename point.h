@@ -4,7 +4,7 @@
 
 typedef struct
 {
-	int x, y;
+	float x, y;
 } Point;
 
 void gambarGaris(Point P1, Point P2, Matrix* M, char c);
