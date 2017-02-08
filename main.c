@@ -192,9 +192,9 @@ int main(){
 	c2 = '2';
 	c3 = '3';
 	c4 = '4';
-	c5 = '5';
-	c6 = '6';
-	c7 = '7';
+	c5 = 240;
+	c6 = 240;
+	c7 = 240;
 	initMatrix(&M, 1200, 700);
 	resetMatrix(&M);
 
@@ -275,7 +275,7 @@ int main(){
 		}
 
 		xPesawat -= 10;
-		fill (xPesawat, 100, WHITE); // pesawat
+		fill (xPesawat, 100, BLUE); // pesawat
 		
 		//check if plane is out of screen
 		if (isOut(&pesawat,-300,0)){
@@ -356,6 +356,10 @@ int main(){
 					}
 				}
 				fill (550, 170, RED);	// ledakan
+				
+			tim.tv_sec = 0;
+			tim.tv_nsec = 10000000;
+			nanosleep(&tim, NULL);
 			}
 		}
 		fill (600, 700, RED);	// meriam bawah
