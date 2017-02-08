@@ -10,5 +10,6 @@ typedef struct
 void initMatrix(Matrix *M, int x, int y);
 void resetMatrix(Matrix *M);
 void printMatrix(Matrix M);
+void fillMatrix(Matrix *M, int x, int y, int color);
 
 #endif

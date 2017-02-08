@@ -1,5 +1,6 @@
 #include "point.h"
 #include "algorithm.h"
+#include <math.h>
 
 void gambarGaris(Point P1, Point P2, Matrix* M, char c) {
 	int dx = absolute(P2.x-P1.x), sx = P1.x<P2.x ? 1 : -1;
@@ -67,3 +68,18 @@ void plotXY(Matrix* M, int x, int y, char c) {
 		M->M[y][x] = c;
 	}
 }
+
+void rotatePoint(Point* P, int initx, int inity, int x) {
+	float angle = x*PI/180;
+	float s = sin(angle);
+	float c = cos(angle);
+
+	float px;
+	float py;
+	
+	px = P->x - initx;
+	py = P->y - inity;
+	P->x = initx + (px * c) - (py * s);
+	P->y = inity + (px * s) + (py * c);		
+}
+

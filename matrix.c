@@ -27,3 +27,13 @@ void printMatrix(Matrix M) {
 		printf("\n");
 	}
 }
+
+void fillMatrix(Matrix *M,int x,int y, int color) {
+    if( (x>=0) && (x < M->xsize) && (y>=0) && (y < M->ysize) && (M->M[y][x]==0) ) {
+    	M->M[y][x]=color;
+		fillMatrix(M,x+1,y,color);
+		fillMatrix(M,x-1,y,color);
+		fillMatrix(M,x,y+1,color);
+		fillMatrix(M,x,y-1,color);
+	}
+}

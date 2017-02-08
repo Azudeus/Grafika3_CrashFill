@@ -20,6 +20,7 @@ char c;
 int end = 1;
 int nBullets = 0;
 Object bullets[20];
+int yBullet[20];
  
 char *fbp = 0;
 int fbfd = 0;
@@ -71,37 +72,40 @@ void fillColor(int color) {
 void fill(int x, int y, int color) 
 {
 	int tempX, tempY;
-	
-	tempX = x+1; tempY = y;
-	location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-               (tempY+vinfo.yoffset) * finfo.line_length;
-    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
-		fillColor(color);
-		fill(tempX, tempY, color);
-	}
+
+	if (x>10 && y>10){
 		
-	tempX = x-1; tempY = y;
-	location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-               (tempY+vinfo.yoffset) * finfo.line_length;
-    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
-		fillColor(color);
-		fill(tempX, tempY, color);
-	}
-	
-	tempX = x; tempY = y+1;
-	location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-               (tempY+vinfo.yoffset) * finfo.line_length;
-    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
-		fillColor(color);
-		fill(tempX, tempY, color);
-	}
-	
-	tempX = x; tempY = y-1;
-	location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-               (tempY+vinfo.yoffset) * finfo.line_length;
-    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
-		fillColor(color);
-		fill(tempX, tempY, color);
+		tempX = x+1; tempY = y;
+		location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+	               (tempY+vinfo.yoffset) * finfo.line_length;
+	    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
+			fillColor(color);
+			fill(tempX, tempY, color);
+		}
+			
+		tempX = x-1; tempY = y;
+		location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+	               (tempY+vinfo.yoffset) * finfo.line_length;
+	    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
+			fillColor(color);
+			fill(tempX, tempY, color);
+		}
+		
+		tempX = x; tempY = y+1;
+		location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+	               (tempY+vinfo.yoffset) * finfo.line_length;
+	    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
+			fillColor(color);
+			fill(tempX, tempY, color);
+		}
+		
+		tempX = x; tempY = y-1;
+		location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+	               (tempY+vinfo.yoffset) * finfo.line_length;
+	    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
+			fillColor(color);
+			fill(tempX, tempY, color);
+		}
 	}
 } 
  
@@ -116,6 +120,7 @@ void *make_bullets(void *x_void_ptr) {
 	while (end == 1) {
 		if (c == '\n') {
 			bullets[nBullets] = makePeluru(600,500);
+			yBullet[nBullets] = 510;
 			++nBullets;
 			if (nBullets >= 19) {
 				nBullets = 0;
@@ -194,16 +199,14 @@ int main(){
 	resetMatrix(&M);
 
 	Object pesawat = makePesawat(950,100);
-	Object ledakan = makeLedakan(1500,100);
-	Object meriam = makeMeriam(600,750);
+	Object ledakan;
 	Object ledakan1;
 	Object ledakan2;
 	Object ledakan3;
+	Object meriam = makeMeriam(600,750);
 
 	gambarObject(pesawat, &M, c1);
     gambarObject(meriam, &M, c3);
-    gambarObject(ledakan, &M, c4);
-
 //----------------------------------------------------------------------------------
 
 	x = 700; y = 1200;       // Where we are going to put the pixel
@@ -238,6 +241,7 @@ int main(){
 		int j;
 		for (j = 0; j < nBullets; ++j) {
 			moveVertical(&bullets[j], -15);
+			yBullet[j] -=15;
 		}
 		resetMatrix(&M);
 		gambarObject(pesawat, &M, c1);
@@ -265,6 +269,11 @@ int main(){
 				}
 			}
 		}
+
+		for (j = 0; j < nBullets; ++j) {
+			fill(600,yBullet[j],WHITE);
+		}
+
 		xPesawat -= 10;
 		fill (xPesawat, 100, WHITE); // pesawat
 		
@@ -280,23 +289,42 @@ int main(){
 			pesawat = makePesawat(1500,100);
 			ledakan1 = makeLedakanPesawat1(550,100);
 			ledakan2 = makeLedakanPesawat2(550,100);
-			ledakan3 = makeLedakanPesawat3(550,100);
+			ledakan3 = makeLedakanPesawat3(550,110);
 			collide = 1;
+
+			Point l1;
+			Point l2;
+			Point l3;
+			l1.x = 570;
+			l1.y = 100;
+			l2.x = 570;
+			l2.y = 100;
+			l3.x = 570;
+			l3.y = 100;
 
 			int dx = 0;
 			while(isOut(&ledakan2,0,1000)){
 				dx++;
 				moveHorizontal(&ledakan1,-3);
 				moveVertical(&ledakan1,((dx*dx)+2*dx)/1000);
+				l1.x += -3;
+				l1.y +=((dx*dx)+2*dx)/1000;
 				rotateCounterClockwise(&ledakan1,15);
+				// rotatePoint(&l1,550,100,-15);
 
 				moveHorizontal(&ledakan2,2);
 				moveVertical(&ledakan2,((dx*dx)+2*dx)/1500);
+				l2.x += 2;
+				l2.y +=((dx*dx)+2*dx)/1500;
 				rotateClockwise(&ledakan2,5);
+				// rotatePoint(&l2,550,100,5);
 
 				moveHorizontal(&ledakan3,5);
 				moveVertical(&ledakan3,((dx*dx)+2*dx)/1200);
+				l3.x += 5;
+				l3.y +=((dx*dx)+2*dx)/1200;
 				rotateClockwise(&ledakan3,10);
+				// rotatePoint(&l3,550,110,10);
 
 				resetMatrix(&M);
 				gambarObject(meriam, &M, c3);
@@ -304,6 +332,9 @@ int main(){
 				gambarObject(ledakan1, &M, c5);
 				gambarObject(ledakan2, &M, c5);
 				gambarObject(ledakan3, &M, c5);
+				// fill (l1.x,l3.y,WHITE);
+				// fill (l2.x,l3.y,WHITE);
+				// fill (l3.x,l3.y,WHITE);
 
 				for (y = 0; y < 700; y++) {
 					for (x = 0; x < 1200; x++) {
@@ -324,6 +355,7 @@ int main(){
 						}
 					}
 				}
+				fill (550, 170, RED);	// ledakan
 			}
 		}
 		fill (600, 700, RED);	// meriam bawah
