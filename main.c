@@ -30,6 +30,12 @@ long int screensize = 0;
 long location;
 struct timespec tim; 
  
+const int defXMeriam = 600;
+const int defXBullet = 600;
+
+int XMeriam;
+int XBullet;
+
 #define RED 1
 #define BLACK 2
 #define WHITE 3
@@ -112,14 +118,14 @@ void fill(int x, int y, int color)
 void *get_keypress(void *x_void_ptr)
 {
 	while (end == 1) {
-		c = getchar();		
+		c = getchar();
 	}
 }
 
 void *make_bullets(void *x_void_ptr) {
 	while (end == 1) {
 		if (c == '\n') {
-			bullets[nBullets] = makePeluru(600,500);
+			bullets[nBullets] = makePeluru(XBullet,500);
 			yBullet[nBullets] = 510;
 			++nBullets;
 			if (nBullets >= 19) {
@@ -130,9 +136,26 @@ void *make_bullets(void *x_void_ptr) {
 	}
 }
 
+void *move_meriam(void *x_void_ptr) {
+	while (end == 1) {
+		if (c == 'a') {
+			XMeriam = XMeriam - 40;
+			XBullet = XBullet - 40;
+		}
+		if (c == 'd') {
+			XMeriam = XMeriam + 40;
+			XBullet = XBullet + 40;
+		}
+		
+		c = '\0';
+	}
+}
+
+
 int main(){
    	int x = 0, y = 0;
-	
+	XMeriam = defXMeriam;
+	XBullet = defXBullet;
 	// Open the file for reading and writing
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd == -1) {
@@ -161,7 +184,7 @@ int main(){
     // Map the device to memory
     fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED,
                         fbfd, 0);
-    if ((int)fbp == -1) {
+    if ((int)*fbp == -1) {
         perror("Error: failed to map framebuffer device to memory");
         exit(4);
     }
@@ -171,7 +194,7 @@ int main(){
 
 //===============================================================================
 
-	pthread_t thread_keypress, thread_bullet;
+	pthread_t thread_keypress, thread_bullet, thread_meriam;
 
 	if(pthread_create(&thread_keypress, NULL, get_keypress, NULL)) {
 		fprintf(stderr, "Error creating thread\n");
@@ -179,6 +202,11 @@ int main(){
 	}
 	
 	if(pthread_create(&thread_bullet, NULL, make_bullets, NULL)) {
+		fprintf(stderr, "Error creating thread 2\n");
+		return 1;
+	}
+
+	if(pthread_create(&thread_meriam, NULL, move_meriam, NULL)) {
 		fprintf(stderr, "Error creating thread 2\n");
 		return 1;
 	}
@@ -203,13 +231,15 @@ int main(){
 	Object ledakan1;
 	Object ledakan2;
 	Object ledakan3;
-	Object meriam = makeMeriam(600,750);
-
+	
+	Object meriam = makeMeriam(XMeriam,750);
+	gambarObject(meriam, &M, c3);
+	
 	gambarObject(pesawat, &M, c1);
-    gambarObject(meriam, &M, c3);
+    
 //----------------------------------------------------------------------------------
 
-	x = 700; y = 1200;       // Where we are going to put the pixel
+	x = 1200; y = 700;       // Where we are going to put the pixel
 
 //---------------
 	for (y = 0; y < 700; y++) {
@@ -237,6 +267,8 @@ int main(){
 	int xPesawat = 1100;
 	//the main display, game ends when bullet collides with plane
 	do {
+		//newmeriam = makeMeriam(XMeriam,750);//testing
+		//meriam = newmeriam;
 		moveHorizontal(&pesawat,-10);
 		int j;
 		for (j = 0; j < nBullets; ++j) {
@@ -245,6 +277,8 @@ int main(){
 		}
 		resetMatrix(&M);
 		gambarObject(pesawat, &M, c1);
+		
+		meriam = makeMeriam(XMeriam,750);
 	   	gambarObject(meriam, &M, c3);
 	   	gambarObject(ledakan, &M, c4);
 		for (j = 0; j < nBullets; ++j) {
@@ -271,11 +305,11 @@ int main(){
 		}
 
 		for (j = 0; j < nBullets; ++j) {
-			fill(600,yBullet[j],WHITE);
+			//fill(600,yBullet[j],WHITE);
 		}
 
 		xPesawat -= 10;
-		fill (xPesawat, 100, BLUE); // pesawat
+		//fill (xPesawat, 100, BLUE); // pesawat
 		
 		//check if plane is out of screen
 		if (isOut(&pesawat,-300,0)){
@@ -355,16 +389,16 @@ int main(){
 						}
 					}
 				}
-				fill (550, 170, RED);	// ledakan
+				//fill (550, 170, RED);	// ledakan
 				
 			tim.tv_sec = 0;
 			tim.tv_nsec = 10000000;
 			nanosleep(&tim, NULL);
 			}
 		}
-		fill (600, 700, RED);	// meriam bawah
-		fill (600, 680, GREEN);	// meriam atas
-		fill (600, 620, BLUE);	// meriam persegi panjang
+		//fill (600, 700, RED);	// meriam bawah
+		//fill (600, 680, GREEN);	// meriam atas
+		//fill (600, 620, BLUE);	// meriam persegi panjang
 		
 		tim.tv_sec = 0;
 		tim.tv_nsec = 100000000;
