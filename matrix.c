@@ -29,11 +29,40 @@ void printMatrix(Matrix M) {
 }
 
 void fillMatrix(Matrix *M,int x,int y, int color) {
-    if( (x>=0) && (x < M->xsize) && (y>=0) && (y < M->ysize) && (M->M[y][x]==0) ) {
+	
+    if( (x>=0) && (x <= 1200) && (y>=0) && (y <= 700) && (M->M[y][x]==0) ) {
     	M->M[y][x]=color;
 		fillMatrix(M,x+1,y,color);
 		fillMatrix(M,x-1,y,color);
 		fillMatrix(M,x,y+1,color);
 		fillMatrix(M,x,y-1,color);
 	}
+	/*
+	int tempX, tempY;
+	if((x>0) && (x < 1200) && (y>0) && (y < 700)) {
+    	tempX = x+1; tempY = y;
+    	if (M->M[y][x]==0) {
+			M->M[y][x] = color;
+			fillMatrix(M, tempX, tempY, color);
+		}
+		
+		tempX = x-1; tempY = y;
+    	if (M->M[y][x]==0) {
+			M->M[y][x] = color;
+			fillMatrix(M, tempX, tempY, color);
+		}
+		
+		tempX = x; tempY = y+1;
+    	if (M->M[y][x]==0) {
+			M->M[y][x] = color;
+			fillMatrix(M, tempX, tempY, color);
+		}
+		
+		tempX = x; tempY = y-1;
+    	if (M->M[y][x]==0) {
+			M->M[y][x] = color;
+			fillMatrix(M, tempX, tempY, color);
+		}
+	}
+	* */
 }
