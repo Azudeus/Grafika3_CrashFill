@@ -365,11 +365,11 @@ int main(){
 				moveHorizontal(&ledakan1,-3);
 				moveVertical(&ledakan1,((dx*dx)+2*dx)/1000);
 				
-
+				fill(xWheel, yWheel, WHITE);
 				if (!isLanded) {
 					moveVertical(&wheel, 10);
 					rotateWheelClockwise(&wheel, 15);
-					fill(xWheel, yWheel, WHITE);
+
 					yWheel+=10;
 				}
 
@@ -381,7 +381,6 @@ int main(){
 				}
 				if (isBounced) {
 					wheelBounce(&wheel, xtreamPoint, &isXtream);
-					fill(xWheel, yWheel, WHITE);
 
 					xWheel+=3;
 					if (!isXtream)
@@ -418,7 +417,7 @@ int main(){
 				// fill (l1.x,l3.y,WHITE);
 				// fill (l2.x,l3.y,WHITE);
 				// fill (l3.x,l3.y,WHITE);
-
+				// fillMatrix(&M, xWheel, yWheel, WHITE); tidak bekerja
 				for (y = 0; y < 700; y++) {
 					for (x = 0; x < 1200; x++) {
 						location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
