@@ -293,7 +293,7 @@ int main(){
 		
 		
 		fillMatrix(&M, xPesawat, 100, BLUE);	// pesawat
-		//fillMatrix(&M, xWheel, 125, WHITE);		// ban
+		fillMatrix(&M, xWheel, 125, WHITE);		// ban
 	   	for (y = 0; y < 700; y++) {
 			for (x = 0; x < 1200; x++) {
 				location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
@@ -369,7 +369,7 @@ int main(){
 				if (!isLanded) {
 					moveVertical(&wheel, 10);
 					rotateWheelClockwise(&wheel, 15);
-					fill(xWheel, yWheel, GREEN);
+					fill(xWheel, yWheel, WHITE);
 					yWheel+=10;
 				}
 
@@ -381,7 +381,9 @@ int main(){
 				}
 				if (isBounced) {
 					wheelBounce(&wheel, xtreamPoint, &isXtream);
-					fill(xWheel, yWheel, GREEN);xWheel+=3;
+					fill(xWheel, yWheel, WHITE);
+
+					xWheel+=3;
 					if (!isXtream)
 						yWheel-=5;
 					else yWheel+=5;
@@ -451,7 +453,7 @@ int main(){
 		tim.tv_nsec = 100000000;
 		//nanosleep(&tim, NULL);
 	} while (collide == 0);
-	//fill(xWheel, yWheel, GREEN);
+	fill(xWheel, yWheel, WHITE);
     //closing connection
     end = 0;
     munmap(fbp, screensize);
