@@ -1,422 +1,229 @@
-// #include "garis.h"
-
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <linux/fb.h>
-#include <sys/mman.h>
-#include <sys/ioctl.h>
-#include <math.h>
-#include <time.h>
-
-#include "lingkaran.h"
-#include "matrix.h"
-#include "point.h"
 #include "object.h"
+#include "lingkaran.h"
+#include <math.h>
 #include <stdio.h>
-#include <pthread.h>
+#include <stdlib.h>
 
-char c;
-int end = 1;
-int nBullets = 0;
-Object bullets[20];
-int yBullet[20];
- 
-char *fbp = 0;
-int fbfd = 0;
-struct fb_var_screeninfo vinfo;
-struct fb_fix_screeninfo finfo;
-long int screensize = 0;
-long location;
-struct timespec tim; 
- 
-const int defXMeriam = 600;
-const int defXBullet = 600;
-
-int XMeriam;
-int XBullet;
-
-#define RED 1
-#define BLACK 2
-#define WHITE 3
-#define GREEN 4
-#define BLUE 5
-
-void fillColor(int color) {
-	if(color == RED) {
-		*(fbp + location) = 0; 
-		*(fbp + location + 1) = 0;   
-		*(fbp + location + 2) = 255;   
-		*(fbp + location + 3) = 0;  
-	}
-	else if(color == BLACK) {
-		*(fbp + location) = 0; 
-		*(fbp + location + 1) = 0; 
-		*(fbp + location + 2) = 0; 
-		*(fbp + location + 3) = 0;   					
-	}
-	else if(color == GREEN) {
-		*(fbp + location) = 0;    
-		*(fbp + location + 1) = 255; 
-		*(fbp + location + 2) = 0; 
-		*(fbp + location + 3) = 0; 
-	} 
-	else if(color == WHITE) {
-		*(fbp + location) = 255; 
-		*(fbp + location + 1) = 255;  
-		*(fbp + location + 2) = 255;
-		*(fbp + location + 3) = 0; 
-	}
-	else if(color == BLUE) {
-		*(fbp + location) = 255; 
-		*(fbp + location + 1) = 0;  
-		*(fbp + location + 2) = 0;
-		*(fbp + location + 3) = 50; 
-	}
+void setXYObject(Object* O, int x, int y) {
+	O->pointInit.x = x;
+	O->pointInit.y = y;
 }
- 
-void fill(int x, int y, int color) 
-{
-	int tempX, tempY;
 
-	if (x>10 && y>10){
-		
-		tempX = x+1; tempY = y;
-		location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-	               (tempY+vinfo.yoffset) * finfo.line_length;
-	    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
-			fillColor(color);
-			fill(tempX, tempY, color);
-		}
-			
-		tempX = x-1; tempY = y;
-		location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-	               (tempY+vinfo.yoffset) * finfo.line_length;
-	    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
-			fillColor(color);
-			fill(tempX, tempY, color);
-		}
-		
-		tempX = x; tempY = y+1;
-		location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-	               (tempY+vinfo.yoffset) * finfo.line_length;
-	    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
-			fillColor(color);
-			fill(tempX, tempY, color);
-		}
-		
-		tempX = x; tempY = y-1;
-		location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-	               (tempY+vinfo.yoffset) * finfo.line_length;
-	    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
-			fillColor(color);
-			fill(tempX, tempY, color);
-		}
-	}
-} 
- 
-void *get_keypress(void *x_void_ptr)
-{
-	while (end == 1) {
-		c = getchar();
+void moveVertical(Object* O, int y) {
+	O->pointInit.y = O->pointInit.y + y;
+}
+
+void moveHorizontal(Object* O, int x) {
+	O->pointInit.x = O->pointInit.x + x;
+}
+
+void rotateClockwise(Object* O, int x) {
+	float angle = x*PI/180;
+	float s = sin(angle);
+	float c = cos(angle);
+
+	float px;
+	float py;
+	for (int i=0 ;i < O->size ;i++) {
+		px = O->P[i].x;
+		py = O->P[i].y;
+		O->P[i].x = (px * c) - (py * s);
+		O->P[i].y = (px * s) + (py * c);		
 	}
 }
 
-void *make_bullets(void *x_void_ptr) {
-	while (end == 1) {
-		if (c == '\n') {
-			bullets[nBullets] = makePeluru(XBullet,500);
-			yBullet[nBullets] = 510;
-			++nBullets;
-			if (nBullets >= 19) {
-				nBullets = 0;
-			}
-			c = 'p';
-		}
-	}
-}
+void rotateCounterClockwise(Object* O, int x) {
+	float angle = x*PI/180;
+	float s = -sin(angle);
+	float c = cos(angle);
 
-void *move_meriam(void *x_void_ptr) {
-	while (end == 1) {
-		if (c == 'a') {
-			XMeriam = XMeriam - 40;
-			XBullet = XBullet - 40;
-		}
-		if (c == 'd') {
-			XMeriam = XMeriam + 40;
-			XBullet = XBullet + 40;
-		}
-		
-		c = '\0';
+	float px;
+	float py;
+	for (int i=0 ;i<O->size ;i++) {
+		px = O->P[i].x;
+		py = O->P[i].y;
+		O->P[i].x = (int) round((px * c) - (py * s));
+		O->P[i].y = (int) round((px * s) + (py * c));		
 	}
 }
 
 
-int main(){
-   	int x = 0, y = 0;
-	XMeriam = defXMeriam;
-	XBullet = defXBullet;
-	// Open the file for reading and writing
-    fbfd = open("/dev/fb0", O_RDWR);
-    if (fbfd == -1) {
-        perror("Error: cannot open framebuffer device");
-        exit(1);
-    }
-    printf("The framebuffer device was opened successfully.\n");
-
-    // Get fixed screen information
-    if (ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo) == -1) {
-        perror("Error reading fixed information");
-        exit(2);
-    }
-
-    // Get variable screen information
-    if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
-        perror("Error reading variable information");
-        exit(3);
-    }
-
-    printf("%dx%d, %dbpp\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
-
-    // Figure out the size of the screen in bytes
-    screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
-
-    // Map the device to memory
-    fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED,
-                        fbfd, 0);
-    if ((int)*fbp == -1) {
-        perror("Error: failed to map framebuffer device to memory");
-        exit(4);
-    }
-    printf("The framebuffer device was mapped to memory successfully.\n");
-
-
-
-//===============================================================================
-
-	pthread_t thread_keypress, thread_bullet, thread_meriam;
-
-	if(pthread_create(&thread_keypress, NULL, get_keypress, NULL)) {
-		fprintf(stderr, "Error creating thread\n");
+int isOut(Object* O,int rangex, int rangey) {
+	if ((O->pointInit.x<=rangex)||(O->pointInit.y<=rangey)){
 		return 1;
+	}else{
+		return 0;
 	}
-	
-	if(pthread_create(&thread_bullet, NULL, make_bullets, NULL)) {
-		fprintf(stderr, "Error creating thread 2\n");
-		return 1;
+}
+
+
+void gambarObject(Object O, Matrix* M, char c) {
+	Point start, finish;
+	for(int i = 0;i < O.size-1 ;i++) {
+		setXY(&start, (int)O.P[i].x + O.pointInit.x, (int)O.P[i].y + O.pointInit.y);
+		setXY(&finish, (int)O.P[i+1].x + O.pointInit.x, (int)O.P[i+1].y + O.pointInit.y);
+		gambarGaris(start, finish, M, c);
 	}
 
-	if(pthread_create(&thread_meriam, NULL, move_meriam, NULL)) {
-		fprintf(stderr, "Error creating thread 2\n");
-		return 1;
+	setXY(&start, (int)O.P[O.size - 1].x + O.pointInit.x, (int)O.P[O.size - 1].y + O.pointInit.y);
+	setXY(&finish, (int)O.P[0].x + O.pointInit.x, (int)O.P[0].y + O.pointInit.y);
+	gambarGaris(start, finish, M, c);
+
+	for(int i = 0;i < O.nlingkaran ;i++) {
+        Lingkaran L;
+        L.x = O.L[i].x + O.pointInit.x;
+        L.y = O.L[i].y + O.pointInit.y;
+        L.r = O.L[i].r;
+		gambarLingkaran(&L, M, c);
 	}
-//----------------------------------------------------------------------------------
+}
 
-	Matrix M;
-	Point P1, P2;
-	Lingkaran L;
-	char c1, c2, c3, c4, c5, c6, c7;
-	c1 = '1';
-	c2 = '2';
-	c3 = '3';
-	c4 = '4';
-	c5 = 240;
-	c6 = 240;
-	c7 = 240;
-	initMatrix(&M, 1200, 700);
-	resetMatrix(&M);
-
-	Object pesawat = makePesawat(950,100);
-	Object ledakan;
-	Object ledakan1;
-	Object ledakan2;
-	Object ledakan3;
-	
-	Object meriam = makeMeriam(XMeriam,750);
-	gambarObject(meriam, &M, c3);
-	
-	gambarObject(pesawat, &M, c1);
-    
-//----------------------------------------------------------------------------------
-
-	x = 1200; y = 700;       // Where we are going to put the pixel
-
-//---------------
-	for (y = 0; y < 700; y++) {
-        for (x = 0; x < 1200; x++) {
-            location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-                       (y+vinfo.yoffset) * finfo.line_length;
-
-            if (vinfo.bits_per_pixel == 32) {
-                *(fbp + location) = M.M[y][x];        // Some blue
-                *(fbp + location + 1) = M.M[y][x]; //15+(x-100)/2;     // A little green
-                *(fbp + location + 2) = M.M[y][x]; //200-(y-100)/5;    // A lot of red
-                *(fbp + location + 3) = 0;      // No transparency
-            } else  { //assume 16bpp
-                int b = 10;
-                int g = (x-100)/6;     // A little green
-                int r = 31-(y-100)/16;    // A lot of red
-                unsigned short int t = r<<11 | g << 5 | b;
-                *((unsigned short int*)(fbp + location)) = t;
-            }
+int isObjectCollide(Object O, Matrix* M, char c) {
+    int ret = 0;
+	Point start, finish;
+	for(int i = 0;i < O.size-1 && ret == 0;i++) {
+		setXY(&start, O.P[i].x + O.pointInit.x, O.P[i].y + O.pointInit.y);
+		setXY(&finish, O.P[i+1].x + O.pointInit.x, O.P[i+1].y + O.pointInit.y);
+		ret = isGarisPutus(start, finish, M, c);
+	}
+    if (ret == 0) {
+        setXY(&start, O.P[O.size - 1].x + O.pointInit.x, O.P[O.size - 1].y + O.pointInit.y);
+        setXY(&finish, O.P[0].x + O.pointInit.x, O.P[0].y + O.pointInit.y);
+        ret = isGarisPutus(start, finish, M, c);
+    }
+    if (ret == 0) {
+        Lingkaran L;
+        for(int i = 0;i < O.nlingkaran && ret == 0;i++) {
+            L.x = O.L[i].x + O.pointInit.x;
+            L.y = O.L[i].y + O.pointInit.y;
+            L.r = O.L[i].r;
+            ret = isLingkaranPutus(&L, M, c);
         }
     }
+    return ret;
+}
 
-//---------------
-	int collide = 0;
-	int xPesawat = 1100;
-	//the main display, game ends when bullet collides with plane
-	do {
-		//newmeriam = makeMeriam(XMeriam,750);//testing
-		//meriam = newmeriam;
-		moveHorizontal(&pesawat,-10);
-		int j;
-		for (j = 0; j < nBullets; ++j) {
-			moveVertical(&bullets[j], -15);
-			yBullet[j] -=15;
-		}
-		resetMatrix(&M);
-		gambarObject(pesawat, &M, c1);
-		
-		meriam = makeMeriam(XMeriam,750);
-	   	gambarObject(meriam, &M, c3);
-	   	gambarObject(ledakan, &M, c4);
-		for (j = 0; j < nBullets; ++j) {
-			gambarObject(bullets[j], &M, c2);
-		}
-	   	for (y = 0; y < 700; y++) {
-			for (x = 0; x < 1200; x++) {
-				location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-				(y+vinfo.yoffset) * finfo.line_length;
-
-				if (vinfo.bits_per_pixel == 32) {
-					*(fbp + location) = M.M[y][x];        // Some blue
-					*(fbp + location + 1) = M.M[y][x]; //15+(x-100)/2;     // A little green
-					*(fbp + location + 2) = M.M[y][x]; //200-(y-100)/5;    // A lot of red
-					*(fbp + location + 3) = 0;      // No transparency
-				} else  { //assume 16bpp
-					int b = 10;
-					int g = (x-100)/6;     // A little green
-					int r = 31-(y-100)/16;    // A lot of red
-					unsigned short int t = r<<11 | g << 5 | b;
-					*((unsigned short int*)(fbp + location)) = t;
-				}
-			}
-		}
-
-		for (j = 0; j < nBullets; ++j) {
-			//fill(600,yBullet[j],WHITE);
-		}
-
-		xPesawat -= 10;
-		//fill (xPesawat, 100, BLUE); // pesawat
-		
-		//check if plane is out of screen
-		if (isOut(&pesawat,-300,0)){
-    		moveHorizontal(&pesawat,1500);
-    		xPesawat = 1300;
-    	}
-		
-		//check collide condition
-		if (isObjectCollide(pesawat, &M, c1) == 1) {
-			ledakan = makeLedakan(550,100);
-			pesawat = makePesawat(1500,100);
-			ledakan1 = makeLedakanPesawat1(550,100);
-			ledakan2 = makeLedakanPesawat2(550,100);
-			ledakan3 = makeLedakanPesawat3(550,110);
-			collide = 1;
-
-			Point l1;
-			Point l2;
-			Point l3;
-			l1.x = 570;
-			l1.y = 100;
-			l2.x = 570;
-			l2.y = 100;
-			l3.x = 570;
-			l3.y = 100;
-
-			int dx = 0;
-			while(isOut(&ledakan2,0,1000)){
-				dx++;
-				moveHorizontal(&ledakan1,-3);
-				moveVertical(&ledakan1,((dx*dx)+2*dx)/1000);
-				l1.x += -3;
-				l1.y +=((dx*dx)+2*dx)/1000;
-				rotateCounterClockwise(&ledakan1,15);
-				// rotatePoint(&l1,550,100,-15);
-
-				moveHorizontal(&ledakan2,2);
-				moveVertical(&ledakan2,((dx*dx)+2*dx)/1500);
-				l2.x += 2;
-				l2.y +=((dx*dx)+2*dx)/1500;
-				rotateClockwise(&ledakan2,5);
-				// rotatePoint(&l2,550,100,5);
-
-				moveHorizontal(&ledakan3,5);
-				moveVertical(&ledakan3,((dx*dx)+2*dx)/1200);
-				l3.x += 5;
-				l3.y +=((dx*dx)+2*dx)/1200;
-				rotateClockwise(&ledakan3,10);
-				// rotatePoint(&l3,550,110,10);
-
-				resetMatrix(&M);
-				gambarObject(meriam, &M, c3);
-				gambarObject(ledakan, &M, c4);
-				gambarObject(ledakan1, &M, c5);
-				gambarObject(ledakan2, &M, c5);
-				gambarObject(ledakan3, &M, c5);
-				// fill (l1.x,l3.y,WHITE);
-				// fill (l2.x,l3.y,WHITE);
-				// fill (l3.x,l3.y,WHITE);
-
-				for (y = 0; y < 700; y++) {
-					for (x = 0; x < 1200; x++) {
-						location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-								   (y+vinfo.yoffset) * finfo.line_length;
-
-						if (vinfo.bits_per_pixel == 32) {
-							*(fbp + location) = M.M[y][x];        // Some blue
-							*(fbp + location + 1) = M.M[y][x]; //15+(x-100)/2;     // A little green
-							*(fbp + location + 2) = M.M[y][x]; //200-(y-100)/5;    // A lot of red
-							*(fbp + location + 3) = 0;      // No transparency
-						} else  { //assume 16bpp
-							int b = 10;
-							int g = (x-100)/6;     // A little green
-							int r = 31-(y-100)/16;    // A lot of red
-							unsigned short int t = r<<11 | g << 5 | b;
-							*((unsigned short int*)(fbp + location)) = t;
-						}
-					}
-				}
-				//fill (550, 170, RED);	// ledakan
-				
-			tim.tv_sec = 0;
-			tim.tv_nsec = 10000000;
-			nanosleep(&tim, NULL);
-			}
-		}
-		//fill (600, 700, RED);	// meriam bawah
-		//fill (600, 680, GREEN);	// meriam atas
-		//fill (600, 620, BLUE);	// meriam persegi panjang
-		
-		tim.tv_sec = 0;
-		tim.tv_nsec = 100000000;
-		nanosleep(&tim, NULL);
-	} while (collide == 0);
-
-    //closing connection
-    end = 0;
-    munmap(fbp, screensize);
-    close(fbfd);
-
-	if(pthread_join(thread_keypress, NULL)) {
-		fprintf(stderr, "Error joining thread\n");
-		return 2;
+Object makePeluru(int xinit, int yinit) {
+	int x[6] = {2, 6, 6, -6, -6, -2};
+	int y[6] = {0, 8, 24, 24, 8, 0};
+	Object O;
+	for(int i = 0;i < 6;i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
 	}
-	if(pthread_join(thread_bullet, NULL)) {
-		fprintf(stderr, "Error joining thread 2\n");
-		return 2;
+
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = 6;
+	O.nlingkaran = 0;
+	return O;
+}
+
+Object makePesawat(int xinit, int yinit) {
+	int x[22] = {0, 16, 81, 125, 134, 110, 112, 154, 167, 176, 169, 169, 176, 167, 154, 112, 110, 134, 125,  81,  16, 0};
+	int y[22] = {3, 11, 11, 57 , 57 , 21 , 11 , 9  , 28 , 28 , 11 , -11, -28, -28, -9 , -11, -21, -57, -57, -11, -11, -3};
+	Object O;
+	for(int i = 0;i < 22;i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
 	}
-    return 0;
+
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = 22;
+	O.nlingkaran = 0;
+	return O;
+}
+
+Object makeLedakanPesawat1(int xinit, int yinit) {
+	int x[6] = {0, 16, 75,  81,  16, 0};
+	int y[6] = {3, 11, 11, -11, -11, -3};
+	Object O;
+	for(int i = 0;i < 6;i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
+	}
+
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = 6;
+	O.nlingkaran = 0;
+	return O;
+}
+
+Object makeLedakanPesawat2(int xinit, int yinit) {
+	int x[6] = {0, 44 , 53 , 29 , 31 , 5};
+	int y[6] = {0, 46 , 46 , 10 , 0  , -25};
+	Object O;
+	for(int i = 0;i < 6;i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
+	}
+
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = 6;
+	O.nlingkaran = 0;
+	return O;
+}
+
+Object makeLedakanPesawat3(int xinit, int yinit) {
+	int x[14] = {0, 42, 55, 64, 57, 57, 64, 55, 42, 0, -2, 22, 13,  -31};
+	int y[14] = {0, -2  , 17 , 17 , 0 , -22, -39, -39, -20 , -22, -32, -68, -68, -22};
+	Object O;
+	for(int i = 0;i < 14;i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
+	}
+
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = 14;
+	O.nlingkaran = 0;
+	return O;
+}
+
+
+
+Object makeLedakan(int xinit, int yinit) {
+	int x[20] = {0, 20, 46, 40, 84, 54, 86, 51, 72, 29, 28, 4, -34, -19, -60, -22, -67, -21, -47, -4};
+	int y[20] = {0, 54, -2, 61, 39, 86, 96, 107, 145, 116, 148, 112, 117, 103, 107, 79, 64, 56, 8, 49};
+	Object O;
+	for(int i = 0;i < 20;i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
+	}
+
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = 20;
+	O.nlingkaran = 0;
+	return O;
+}
+
+Object makeMeriam(int xinitA, int yinitA) {
+	int x[4] = {13, 13, -13, -13};
+	int y[4] = {-117, -207, -207, -117};
+	Object O;
+	for(int i = 0;i < 4;i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
+	}
+
+	int xL[2] = {0, 0};
+	int yL[2] = {0, 0};
+	int rL[2] = {69, 117};
+	for(int i = 0;i < 2;i++) {
+		O.L[i].x = xL[i];
+		O.L[i].y = yL[i];
+		O.L[i].r = rL[i];
+	}
+
+	O.pointInit.x = xinitA;
+	O.pointInit.y = yinitA;
+	O.size = 4;
+	O.nlingkaran = 2;
+
+
+	return O;
 }
