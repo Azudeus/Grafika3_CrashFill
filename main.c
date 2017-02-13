@@ -204,9 +204,12 @@ int main(){
 	Object ledakan2;
 	Object ledakan3;
 	Object meriam = makeMeriam(600,750);
-
+	Object wheel = makeWheel(980,102);
+	int xWheel = 980;
+	int yWheel=110;
 	gambarObject(pesawat, &M, c1);
     gambarObject(meriam, &M, c3);
+    gambarObject(wheel, &M, c3);
 //----------------------------------------------------------------------------------
 
 	x = 700; y = 1200;       // Where we are going to put the pixel
@@ -238,6 +241,8 @@ int main(){
 	//the main display, game ends when bullet collides with plane
 	do {
 		moveHorizontal(&pesawat,-10);
+		moveHorizontal(&wheel, -10);
+		xWheel -= 10;
 		int j;
 		for (j = 0; j < nBullets; ++j) {
 			moveVertical(&bullets[j], -15);
@@ -246,6 +251,7 @@ int main(){
 		resetMatrix(&M);
 		gambarObject(pesawat, &M, c1);
 	   	gambarObject(meriam, &M, c3);
+	   	gambarObject(wheel, &M, c3);
 	   	gambarObject(ledakan, &M, c4);
 		for (j = 0; j < nBullets; ++j) {
 			gambarObject(bullets[j], &M, c2);
@@ -271,16 +277,19 @@ int main(){
 		}
 
 		for (j = 0; j < nBullets; ++j) {
-			fill(600,yBullet[j],WHITE);
+			//fill(600,yBullet[j],WHITE);
 		}
 
 		xPesawat -= 10;
 		fill (xPesawat, 100, BLUE); // pesawat
+		fill (xWheel, 125, GREEN);
 		
 		//check if plane is out of screen
 		if (isOut(&pesawat,-300,0)){
     		moveHorizontal(&pesawat,1500);
+    		moveHorizontal(&wheel, 1500);
     		xPesawat = 1300;
+    		xWheel = 1250;
     	}
 		
 		//check collide condition
@@ -290,6 +299,7 @@ int main(){
 			ledakan1 = makeLedakanPesawat1(550,100);
 			ledakan2 = makeLedakanPesawat2(550,100);
 			ledakan3 = makeLedakanPesawat3(550,110);
+
 			collide = 1;
 
 			Point l1;
@@ -303,10 +313,37 @@ int main(){
 			l3.y = 100;
 
 			int dx = 0;
-			while(isOut(&ledakan2,0,1000)){
+			int xtreamPoint = 550;
+			int isLanded=0;
+			int isBounced=0;
+			int isXtream;
+			while(xtreamPoint<670){
 				dx++;
 				moveHorizontal(&ledakan1,-3);
 				moveVertical(&ledakan1,((dx*dx)+2*dx)/1000);
+				
+
+				if (!isLanded) {
+					moveVertical(&wheel, 10);
+					rotateWheelClockwise(&wheel, 15);
+					fill(xWheel, yWheel, GREEN);
+					yWheel+=10;
+				}
+
+				if (isWheelOut(&wheel)) {
+					xtreamPoint+=14;
+					isLanded=1;
+					isBounced=1;
+					isXtream=0;
+				}
+				if (isBounced) {
+					wheelBounce(&wheel, xtreamPoint, &isXtream);
+					fill(xWheel, yWheel, GREEN);xWheel+=3;
+					if (!isXtream)
+						yWheel-=5;
+					else yWheel+=5;
+				}
+
 				l1.x += -3;
 				l1.y +=((dx*dx)+2*dx)/1000;
 				rotateCounterClockwise(&ledakan1,15);
@@ -332,6 +369,7 @@ int main(){
 				gambarObject(ledakan1, &M, c5);
 				gambarObject(ledakan2, &M, c5);
 				gambarObject(ledakan3, &M, c5);
+				gambarObject(wheel, &M, c3);
 				// fill (l1.x,l3.y,WHITE);
 				// fill (l2.x,l3.y,WHITE);
 				// fill (l3.x,l3.y,WHITE);
@@ -355,22 +393,22 @@ int main(){
 						}
 					}
 				}
-				fill (550, 170, RED);	// ledakan
+				//fill (550, 170, RED);	// ledakan
 				
 			tim.tv_sec = 0;
 			tim.tv_nsec = 10000000;
 			nanosleep(&tim, NULL);
 			}
 		}
-		fill (600, 700, RED);	// meriam bawah
-		fill (600, 680, GREEN);	// meriam atas
-		fill (600, 620, BLUE);	// meriam persegi panjang
+		//fill (600, 700, RED);	// meriam bawah
+		//fill (600, 680, GREEN);	// meriam atas
+		//fill (600, 620, BLUE);	// meriam persegi panjang
 		
 		tim.tv_sec = 0;
 		tim.tv_nsec = 100000000;
 		nanosleep(&tim, NULL);
 	} while (collide == 0);
-
+	fill(xWheel, yWheel, GREEN);
     //closing connection
     end = 0;
     munmap(fbp, screensize);

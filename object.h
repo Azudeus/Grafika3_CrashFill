@@ -19,8 +19,11 @@ void setXYObject(Object* O, int x, int y);
 void moveVertical(Object* O, int y);
 void moveHorizontal(Object* O, int x);
 void rotateClockwise(Object* O, int angle);
+void rotateWheelClockwise(Object*, int);
 void rotateCounterClockwise(Object* O, int angle);
-int isOut(Object *O, int rangex, int rangey);
+void wheelBounce(Object*, int, int *isXtream);
+int isWheelOut(Object*);
+int isOut(Object *O, float rangex, float rangey);
 void gambarObject(Object O, Matrix* M, char c);
 int isObjectCollide(Object O, Matrix* M, char c);
 Object makePeluru(int xinit, int yinit);
@@ -30,4 +33,5 @@ Object makeLedakanPesawat1(int xinit, int yinit);
 Object makeLedakanPesawat2(int xinit, int yinit);
 Object makeLedakanPesawat3(int xinit, int yinit);
 Object makeMeriam(int xinitA, int yinitA);
+Object makeWheel(int, int);
 #endif

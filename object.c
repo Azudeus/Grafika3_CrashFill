@@ -24,11 +24,34 @@ void rotateClockwise(Object* O, int x) {
 
 	float px;
 	float py;
+	float pLx;
+	float pLy;
 	for (int i=0 ;i < O->size ;i++) {
 		px = O->P[i].x;
 		py = O->P[i].y;
 		O->P[i].x = (px * c) - (py * s);
-		O->P[i].y = (px * s) + (py * c);		
+		O->P[i].y = (px * s) + (py * c);	
+	}
+}
+
+void rotateWheelClockwise(Object* O, int x) {
+	float angle = x*PI/180;
+	float s = sin(angle);
+	float c = cos(angle);
+
+	float px;
+	float py;
+	float pLx;
+	float pLy;
+	for (int i=0 ;i < O->size ;i++) {
+		px = O->P[i].x;
+		py = O->P[i].y;
+		pLx = O->L[i].x;
+		pLy = O->L[i].y;
+		O->P[i].x = (px * c) - (py * s);
+		O->P[i].y = (px * s) + (py * c);	
+		O->L[i].x = (pLx * c) - (pLy * s);
+		O->L[i].y = (pLx * c) + (pLy * s);
 	}
 }
 
@@ -48,7 +71,7 @@ void rotateCounterClockwise(Object* O, int x) {
 }
 
 
-int isOut(Object* O,int rangex, int rangey) {
+int isOut(Object* O,float rangex, float rangey) {
 	if ((O->pointInit.x<=rangex)||(O->pointInit.y<=rangey)){
 		return 1;
 	}else{
@@ -56,6 +79,11 @@ int isOut(Object* O,int rangex, int rangey) {
 	}
 }
 
+int isWheelOut(Object* O) {
+	if (O->pointInit.y>=650) return 1;
+	// printf("%d\n", (int)O->pointInit);
+	return 0;
+}
 
 void gambarObject(Object O, Matrix* M, char c) {
 	Point start, finish;
@@ -226,4 +254,36 @@ Object makeMeriam(int xinitA, int yinitA) {
 
 
 	return O;
+}
+
+Object makeWheel(int xinit, int yinit) {
+	int x[2] = {0,0};
+	int y[2] = {30,10};
+	Object o;
+	for(int i = 0;i < 2;i++) {
+		o.P[i].x = x[i];
+		o.P[i].y = y[i];
+		o.L[i].x = x[i];
+		o.L[i].y = y[i];
+		o.L[i].r = 20;
+	}
+	o.pointInit.x = xinit;
+	o.pointInit.y = yinit;
+	o.size = 2;
+	o.nlingkaran = 1;
+	return o;
+}
+
+void wheelBounce(Object* O, int xtreamPoint, int *isXtream) {
+	// printf("%d %d \n", xtreamPoint, (int)O->pointInit.y);
+	rotateWheelClockwise(O, 5);
+	if (O->pointInit.y > xtreamPoint && !isXtream[0]) {
+		moveHorizontal(O, 3);
+		moveVertical(O, -5);
+	}
+	else  {
+		moveHorizontal(O, 3);
+		moveVertical(O, 5);
+		isXtream[0]=1;
+	}
 }
