@@ -34,4 +34,6 @@ Object makeLedakanPesawat2(int xinit, int yinit);
 Object makeLedakanPesawat3(int xinit, int yinit);
 Object makeMeriam(int xinitA, int yinitA);
 Object makeWheel(int, int);
+Object makeBaling(int xinit, int yinit);
+
 #endif

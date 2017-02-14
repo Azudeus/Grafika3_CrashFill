@@ -239,6 +239,9 @@ int main(){
 	gambarObject(pesawat, &M, c1);
     gambarObject(meriam, &M, c3);
     gambarObject(wheel, &M, c3);
+
+    Object baling = makeBaling(1186, 100);
+    gambarObject(baling, &M, c1);
 //----------------------------------------------------------------------------------
 
 	x = 700; y = 1200;       // Where we are going to put the pixel
@@ -267,20 +270,24 @@ int main(){
 //---------------
 	int collide = 0;
 	int xPesawat = 1100;
+	int xBaling = 1186;
 	int xWheel = 980;
 	int yWheel=110;
 	//the main display, game ends when bullet collides with plane
 	do {
 		moveHorizontal(&pesawat,-2);
 		moveHorizontal(&wheel, -2);
+		moveHorizontal(&baling, -2);
 		int j;
 		for (j = 0; j < nBullets; ++j) {
 			moveVertical(&bullets[j], -2);
 			yBullet[j] -=2;
 		}
 		xWheel -= 2;
+		xBaling -= 2;
 		resetMatrix(&M);
 		gambarObject(pesawat, &M, c1);
+		gambarObject(baling, &M, c1);
 
 		meriam = makeMeriam(XMeriam,750);
 	   	gambarObject(meriam, &M, c3);
@@ -294,6 +301,7 @@ int main(){
 		
 		fillMatrix(&M, xPesawat, 100, BLUE);	// pesawat
 		fillMatrix(&M, xWheel, 125, WHITE);		// ban
+		fillMatrix(&M, xBaling, 100, BLUE);		// baling-baling
 	   	for (y = 0; y < 700; y++) {
 			for (x = 0; x < 1200; x++) {
 				location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
@@ -331,8 +339,10 @@ int main(){
 		if (isOut(&pesawat,-300,0)){
     		moveHorizontal(&pesawat,1500);
     		moveHorizontal(&wheel, 1500);
+    		moveHorizontal(&baling, 1500);
     		xPesawat = 1300;
     		xWheel = 1240;
+    		xBaling = 1386;
     	}
 		
 		//check collide condition

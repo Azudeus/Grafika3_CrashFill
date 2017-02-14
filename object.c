@@ -287,3 +287,19 @@ void wheelBounce(Object* O, int xtreamPoint, int *isXtream) {
 		isXtream[0]=1;
 	}
 }
+
+Object makeBaling(int xinit, int yinit) {
+	int x[16] = {-5, -33, -21, -3, 3, 21, 33, 5, 5, 33, 21, 3, -3, -21, -33, 5};
+	int y[16] = {-3, -21, -33, -5, -5, -33, -21, -3, 3, 21, 22, 5, 5, 33, 21, 3};
+	Object O;
+	for(int i = 0; i < 16; i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
+	}
+
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = 16;
+	O.nlingkaran = 0;
+	return O;
+}
