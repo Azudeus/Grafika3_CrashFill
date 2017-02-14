@@ -103,7 +103,7 @@ void gambarObject(Object O, Matrix* M, char c) {
         L.x = O.L[i].x + O.pointInit.x;
         L.y = O.L[i].y + O.pointInit.y;
         L.r = O.L[i].r;
-		gambarLingkaran(&L, M, c);
+		gambarLingkaran(&L, M, c, O.lingkaranPenuh);
 	}
 }
 
@@ -268,7 +268,7 @@ Object makeMeriam(int xinitA, int yinitA) {
 	O.pointInit.y = yinitA;
 	O.size = 4;
 	O.nlingkaran = 2;
-
+	O.lingkaranPenuh = 1;
 
 	return O;
 }
@@ -288,6 +288,7 @@ Object makeWheel(int xinit, int yinit) {
 	o.pointInit.y = yinit;
 	o.size = 2;
 	o.nlingkaran = 1;
+	o.lingkaranPenuh = 1;
 	return o;
 }
 
@@ -320,3 +321,47 @@ Object makeLine(int xinit, int yinit) {
 	return O;
 }
 
+Object makeParasut(int xinit, int yinit) {
+	int x[1] = {100};
+	int y[1] = {80};
+	Object O;
+	O.L[0].x = x[0];
+	O.L[0].y = y[0];
+	O.L[0].r = 100;
+
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = 1;
+	O.nlingkaran = 1;
+	O.lingkaranPenuh = 0;
+	return O;
+}
+
+Object makePilot(int xinit, int yinit) {
+	int x[15] = {0, 200, 100, 120, 100, 100, 120, 100, 80, 100, 100, 80, 100, 0, 100};
+	int y[15] = {0, 0, 100, 100, 100, 130, 150, 130, 150, 130, 100, 100, 100, 0, 80};
+
+	//badan pilot + setengan parasut
+	int i;
+	Object O;
+	for (i=0; i<14;i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
+	}
+
+	//kepala pilot
+	O.L[0].x = x[14];
+	O.L[0].y = y[14];
+	O.L[0].r = 10;
+
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = i;
+	O.nlingkaran = 1;
+	O.lingkaranPenuh = 1;
+	return O;
+}
+
+void pilotTerjun(Object *O) {
+	moveVertical(O, 3);
+}
