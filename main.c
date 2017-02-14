@@ -29,7 +29,7 @@ struct fb_fix_screeninfo finfo;
 long int screensize = 0;
 long location;
 struct timespec tim; 
- 
+
 const int defXMeriam = 600;
 const int defXBullet = 600;
 
@@ -267,7 +267,7 @@ int main(){
 //---------------
 	int collide = 0;
 	int xPesawat = 1100;
-	int xWheel = 983;
+	int xWheel = 980;
 	int yWheel=110;
 	//the main display, game ends when bullet collides with plane
 	do {
@@ -332,7 +332,7 @@ int main(){
     		moveHorizontal(&pesawat,1500);
     		moveHorizontal(&wheel, 1500);
     		xPesawat = 1300;
-    		xWheel = 1253;
+    		xWheel = 1240;
     	}
 		
 		//check collide condition
@@ -365,7 +365,7 @@ int main(){
 				moveHorizontal(&ledakan1,-3);
 				moveVertical(&ledakan1,((dx*dx)+2*dx)/1000);
 				
-				fill(xWheel, yWheel, WHITE);
+				//fillMatrix(&M, xWheel, yWheel, WHITE);
 				if (!isLanded) {
 					moveVertical(&wheel, 10);
 					rotateWheelClockwise(&wheel, 15);
@@ -417,17 +417,22 @@ int main(){
 				// fill (l1.x,l3.y,WHITE);
 				// fill (l2.x,l3.y,WHITE);
 				// fill (l3.x,l3.y,WHITE);
-				// fillMatrix(&M, xWheel, yWheel, WHITE); tidak bekerja
+				fillMatrix(&M, xWheel, yWheel, WHITE);
 				for (y = 0; y < 700; y++) {
 					for (x = 0; x < 1200; x++) {
 						location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
 								   (y+vinfo.yoffset) * finfo.line_length;
 
 						if (vinfo.bits_per_pixel == 32) {
-							*(fbp + location) = M.M[y][x];        // Some blue
-							*(fbp + location + 1) = M.M[y][x]; //15+(x-100)/2;     // A little green
-							*(fbp + location + 2) = M.M[y][x]; //200-(y-100)/5;    // A lot of red
-							*(fbp + location + 3) = 0;      // No transparency
+							if (M.M[y][x] == GREEN || M.M[y][x] == BLUE || M.M[y][x] == RED || M.M[y][x] == WHITE) {
+								fillColor(M.M[y][x]);
+							}
+							else { 
+								*(fbp + location) = M.M[y][x];        // Some blue
+								*(fbp + location + 1) = M.M[y][x]; //15+(x-100)/2;     // A little green
+								*(fbp + location + 2) = M.M[y][x]; //200-(y-100)/5;    // A lot of red
+								*(fbp + location + 3) = 0;      // No transparency
+							}
 						} else  { //assume 16bpp
 							int b = 10;
 							int g = (x-100)/6;     // A little green
@@ -437,6 +442,7 @@ int main(){
 						}
 					}
 				}
+				
 				//fill (550, 170, RED);	// ledakan
 				
 			tim.tv_sec = 0;
