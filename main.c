@@ -77,42 +77,42 @@ void fillColor(int color) {
  
 void fill(int x, int y, int color) 
 {
-	int tempX, tempY;
+	// int tempX, tempY;
 
-	if (x>10 && y>10){
+	// if (x>10 && y>10){
 		
-		tempX = x+1; tempY = y;
-		location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-	               (tempY+vinfo.yoffset) * finfo.line_length;
-	    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
-			fillColor(color);
-			fill(tempX, tempY, color);
-		}
+	// 	tempX = x+1; tempY = y;
+	// 	location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+	//                (tempY+vinfo.yoffset) * finfo.line_length;
+	//     if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
+	// 		fillColor(color);
+	// 		fill(tempX, tempY, color);
+	// 	}
 			
-		tempX = x-1; tempY = y;
-		location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-	               (tempY+vinfo.yoffset) * finfo.line_length;
-	    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
-			fillColor(color);
-			fill(tempX, tempY, color);
-		}
+	// 	tempX = x-1; tempY = y;
+	// 	location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+	//                (tempY+vinfo.yoffset) * finfo.line_length;
+	//     if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
+	// 		fillColor(color);
+	// 		fill(tempX, tempY, color);
+	// 	}
 		
-		tempX = x; tempY = y+1;
-		location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-	               (tempY+vinfo.yoffset) * finfo.line_length;
-	    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
-			fillColor(color);
-			fill(tempX, tempY, color);
-		}
+	// 	tempX = x; tempY = y+1;
+	// 	location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+	//                (tempY+vinfo.yoffset) * finfo.line_length;
+	//     if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
+	// 		fillColor(color);
+	// 		fill(tempX, tempY, color);
+	// 	}
 		
-		tempX = x; tempY = y-1;
-		location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-	               (tempY+vinfo.yoffset) * finfo.line_length;
-	    if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
-			fillColor(color);
-			fill(tempX, tempY, color);
-		}
-	}
+	// 	tempX = x; tempY = y-1;
+	// 	location = (tempX+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+	//                (tempY+vinfo.yoffset) * finfo.line_length;
+	//     if (*(fbp+location)==0 && *(fbp+location+1)==0 && *(fbp+location+2)==0) {
+	// 		fillColor(color);
+	// 		fill(tempX, tempY, color);
+	// 	}
+	// }
 } 
  
 void *get_keypress(void *x_void_ptr)
@@ -249,6 +249,7 @@ int main(){
     gambarObject(baling, &M, c4);
     int xBaling = 1189;
     int yBaling = 100;
+
 //----------------------------------------------------------------------------------
 
 	//x = 700; y = 1200;       // Where we are going to put the pixel
@@ -279,6 +280,7 @@ int main(){
 	int xPesawat = 1100;
 	int xWheel = 980;
 	int yWheel=110;
+
 	//printf("WOIIIIIIIIIIIIIIIIIIIIIIIIIII");
 	//the main display, game ends when bullet collides with plane
 	do {
@@ -310,8 +312,6 @@ int main(){
 			gambarObject(bullets[j], &M, c2);
 			fillMatrix(&M, 600, yBullet[j], WHITE);
 		}
-		
-		
 		
 		//fill (600, 700, RED);	// meriam bawah
 		//fill (600, 680, GREEN);	// meriam atas
@@ -368,11 +368,16 @@ int main(){
 		
 		//check collide condition
 		if (isObjectCollide(pesawat, &M, c1) == 1) {
+			int yParasut = 20;
+
 			ledakan = makeLedakan(550,100);
 			pesawat = makePesawat(1500,100);
 			ledakan1 = makeLedakanPesawat1(550,100);
 			ledakan2 = makeLedakanPesawat2(550,100);
 			ledakan3 = makeLedakanPesawat3(550,110);
+
+			Object pilot = makePilot(xPesawat, 100);
+			Object parasut = makeParasut(xPesawat, 20);
 
 			collide = 1;
 
@@ -426,7 +431,9 @@ int main(){
 					rotateClockwise(&baling, 3);
 					xBaling += 2;
 				}
-				
+			
+				// pilotTerjun(&pilot);
+				// pilotTerjun(&parasut);
 				dx++;
 				moveHorizontal(&ledakan1,-3);
 				moveVertical(&ledakan1,((dx*dx)+2*dx)/1000);
@@ -462,6 +469,8 @@ int main(){
 				gambarObject(ledakan1, &M, c5);
 				gambarObject(ledakan2, &M, c5);
 				gambarObject(ledakan3, &M, c5);
+				gambarObject(pilot, &M, c1);
+				gambarObject(parasut, &M, c1);
 				// fill (l1.x,l3.y,WHITE);
 				// fill (l2.x,l3.y,WHITE);
 				// fill (l3.x,l3.y,WHITE);
@@ -470,7 +479,9 @@ int main(){
 				fillMatrix(&M, 600, 690, RED); // meriam bawah
 				fillMatrix(&M, 600, 680, GREEN); // meriam atas
 				fillMatrix(&M, 600, 620, BLUE); // meriam persegi panjang
-				//fillMatrix(&M, xWheel, yWheel, WHITE);
+				fillMatrix(&M, xWheel, yWheel, WHITE);
+				// fillMatrix(&M, xPesawat, 17, WHITE);
+
 				for (y = 0; y < 700; y++) {
 					for (x = 0; x < 1200; x++) {
 						location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
@@ -500,8 +511,7 @@ int main(){
 				
 			tim.tv_sec = 0;
 			tim.tv_nsec = 5000000;
-			//tim.tv_nsec = 500000000;
-			//nanosleep(&tim, NULL);
+			// tim.tv_nsec = 500000000;
 			}
 		}
 		//fill (600, 700, RED);	// meriam bawah
