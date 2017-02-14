@@ -232,7 +232,7 @@ int main(){
 	Object ledakan;
 	Object ledakan1;
 	Object ledakan2;
-	Object ledakan3;
+	Object ledakan3 = makeLedakanPesawat3(500,100);
 	
 	//Object meriam = makeMeriam(XMeriam,750);
 	Object meriam = makeMeriam(600,750);
@@ -250,6 +250,7 @@ int main(){
     int xBaling = 1189;
     int yBaling = 100;
 
+    gambarObject(ledakan3,&M,c4);
 //----------------------------------------------------------------------------------
 
 	//x = 700; y = 1200;       // Where we are going to put the pixel
@@ -274,6 +275,7 @@ int main(){
             }
         }
     }
+    // sleep(5);
 
 //---------------
 	int collide = 0;
@@ -376,20 +378,20 @@ int main(){
 			ledakan2 = makeLedakanPesawat2(550,100);
 			ledakan3 = makeLedakanPesawat3(550,110);
 
-			Object pilot = makePilot(xPesawat, 100);
-			Object parasut = makeParasut(xPesawat, 20);
+			Object pilot = makePilot(xPesawat+50, 100);
+			Object parasut = makeParasut(xPesawat+50, 20);
 
 			collide = 1;
 
 			Point l1;
 			Point l2;
 			Point l3;
-			l1.x = 570;
+			l1.x = 547;
 			l1.y = 100;
-			l2.x = 570;
+			l2.x = 550;
 			l2.y = 100;
-			l3.x = 570;
-			l3.y = 100;
+			l3.x = 550;
+			l3.y = 105;
 
 			int dx = 0;
 			int xtreamPoint = 550;
@@ -432,29 +434,28 @@ int main(){
 					xBaling += 2;
 				}
 			
-				// pilotTerjun(&pilot);
-				// pilotTerjun(&parasut);
+				pilotTerjun(&pilot);
+				pilotTerjun(&parasut);
+				yParasut+=3;
+
 				dx++;
 				moveHorizontal(&ledakan1,-3);
 				moveVertical(&ledakan1,((dx*dx)+2*dx)/1000);
 				l1.x += -3;
 				l1.y +=((dx*dx)+2*dx)/1000;
 				rotateCounterClockwise(&ledakan1,15);
-				// rotatePoint(&l1,550,100,-15);
 
 				moveHorizontal(&ledakan2,2);
 				moveVertical(&ledakan2,((dx*dx)+2*dx)/1500);
 				l2.x += 2;
 				l2.y +=((dx*dx)+2*dx)/1500;
 				rotateClockwise(&ledakan2,5);
-				// rotatePoint(&l2,550,100,5);
 
 				moveHorizontal(&ledakan3,5);
 				moveVertical(&ledakan3,((dx*dx)+2*dx)/1200);
 				l3.x += 5;
 				l3.y +=((dx*dx)+2*dx)/1200;
 				rotateClockwise(&ledakan3,10);
-				// rotatePoint(&l3,550,110,10);
 
 				moveHorizontal(&lineBaling,5);
 				moveVertical(&lineBaling,((dx*dx)+2*dx)/1200);
@@ -469,19 +470,25 @@ int main(){
 				gambarObject(ledakan1, &M, c5);
 				gambarObject(ledakan2, &M, c5);
 				gambarObject(ledakan3, &M, c5);
+
 				gambarObject(pilot, &M, c1);
 				gambarObject(parasut, &M, c1);
 				// fill (l1.x,l3.y,WHITE);
 				// fill (l2.x,l3.y,WHITE);
 				// fill (l3.x,l3.y,WHITE);
+
 				fillMatrix(&M, xBaling, yBaling, WHITE);
+				fillMatrix(&M, xWheel, yWheel, WHITE);
+				fillMatrix(&M, l1.x, l1.y, BLUE);
+				fillMatrix(&M, l2.x, l2.y, BLUE);
+				fillMatrix(&M, l3.x, l3.y, BLUE);
 				fillMatrix(&M, 550, 170, RED); // ledakan
 				fillMatrix(&M, 600, 690, RED); // meriam bawah
 				fillMatrix(&M, 600, 680, GREEN); // meriam atas
 				fillMatrix(&M, 600, 620, BLUE); // meriam persegi panjang
 				fillMatrix(&M, xWheel, yWheel, WHITE);
-				// fillMatrix(&M, xPesawat, 17, WHITE);
-
+				fillMatrix(&M, xPesawat+100, yParasut, WHITE);
+// 
 				for (y = 0; y < 700; y++) {
 					for (x = 0; x < 1200; x++) {
 						location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +

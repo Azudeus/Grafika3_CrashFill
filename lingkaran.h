@@ -8,7 +8,7 @@ typedef struct
 } Lingkaran;
 
 //Menggambar lingkaran pada matriks
-void gambarLingkaran(Lingkaran* L, Matrix* M, char c);
+void gambarLingkaran(Lingkaran* L, Matrix* M, char c, int penuh);
 
 //Memeriksa apakah semua bagian lingkaran pada L pada matriks M berisi karakter c
 //Mengembalikan 0 jika semuanya berisi karakter c
