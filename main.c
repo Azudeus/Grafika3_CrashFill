@@ -125,7 +125,8 @@ void *get_keypress(void *x_void_ptr)
 void *make_bullets(void *x_void_ptr) {
 	while (end == 1) {
 		if (c == '\n') {
-			bullets[nBullets] = makePeluru(XBullet,500);
+			bullets[nBullets] = makePeluru(600,500);
+			//bullets[nBullets] = makePeluru(XBullet,500);
 			yBullet[nBullets] = 510;
 			++nBullets;
 			if (nBullets >= 19) {
@@ -206,10 +207,11 @@ int main(){
 		return 1;
 	}
 
+	/*
 	if(pthread_create(&thread_meriam, NULL, move_meriam, NULL)) {
 		fprintf(stderr, "Error creating thread 2\n");
 		return 1;
-	}
+	} */
 //----------------------------------------------------------------------------------
 
 	Matrix M;
@@ -219,7 +221,7 @@ int main(){
 	c1 = '1';
 	c2 = '2';
 	c3 = '3';
-	c4 = '4';
+	c4 = 240;
 	c5 = 240;
 	c6 = 240;
 	c7 = 240;
@@ -232,16 +234,24 @@ int main(){
 	Object ledakan2;
 	Object ledakan3;
 	
-	Object meriam = makeMeriam(XMeriam,750);
+	//Object meriam = makeMeriam(XMeriam,750);
+	Object meriam = makeMeriam(600,750);
 	gambarObject(meriam, &M, c3);
 
 	Object wheel = makeWheel(980,102);
 	gambarObject(pesawat, &M, c1);
-    gambarObject(meriam, &M, c3);
-    gambarObject(wheel, &M, c3);
+    gambarObject(wheel, &M, c4);
+    
+    
+    Object lineBaling = makeLine(1185, 100);
+    gambarObject(lineBaling, &M, c5);
+    Object baling = makeBaling(1189, 100);
+    gambarObject(baling, &M, c4);
+    int xBaling = 1189;
+    int yBaling = 100;
 //----------------------------------------------------------------------------------
 
-	x = 700; y = 1200;       // Where we are going to put the pixel
+	//x = 700; y = 1200;       // Where we are going to put the pixel
 
 //---------------
 	for (y = 0; y < 700; y++) {
@@ -269,29 +279,47 @@ int main(){
 	int xPesawat = 1100;
 	int xWheel = 980;
 	int yWheel=110;
+	//printf("WOIIIIIIIIIIIIIIIIIIIIIIIIIII");
 	//the main display, game ends when bullet collides with plane
 	do {
 		moveHorizontal(&pesawat,-2);
 		moveHorizontal(&wheel, -2);
+		moveHorizontal(&baling, -2);
+		moveHorizontal(&lineBaling, -2);
+		rotateClockwise(&baling, 2);
 		int j;
 		for (j = 0; j < nBullets; ++j) {
 			moveVertical(&bullets[j], -2);
 			yBullet[j] -=2;
 		}
 		xWheel -= 2;
+		xBaling -= 2;
 		resetMatrix(&M);
+		
 		gambarObject(pesawat, &M, c1);
 
-		meriam = makeMeriam(XMeriam,750);
+		//meriam = makeMeriam(XMeriam,750);
+		meriam = makeMeriam(600,750);
 	   	gambarObject(meriam, &M, c3);
-	   	gambarObject(wheel, &M, c3);
-	   	gambarObject(ledakan, &M, c4);
-		
+	   	gambarObject(wheel, &M, c4);
+	   	//gambarObject(ledakan, &M, c3);
+	   	
+	   	gambarObject(lineBaling, &M, c5);
+		gambarObject(baling, &M, c4);
 		for (j = 0; j < nBullets; ++j) {
 			gambarObject(bullets[j], &M, c2);
+			fillMatrix(&M, 600, yBullet[j], WHITE);
 		}
 		
 		
+		
+		//fill (600, 700, RED);	// meriam bawah
+		//fill (600, 680, GREEN);	// meriam atas
+		//fill (600, 620, BLUE);	// meriam persegi panjang
+		fillMatrix(&M, xBaling, yBaling, WHITE);
+		fillMatrix(&M, 600, 690, RED); // meriam bawah
+		fillMatrix(&M, 600, 680, GREEN); // meriam atas
+		fillMatrix(&M, 600, 620, BLUE); // meriam persegi panjang
 		fillMatrix(&M, xPesawat, 100, BLUE);	// pesawat
 		fillMatrix(&M, xWheel, 125, WHITE);		// ban
 	   	for (y = 0; y < 700; y++) {
@@ -331,9 +359,12 @@ int main(){
 		if (isOut(&pesawat,-300,0)){
     		moveHorizontal(&pesawat,1500);
     		moveHorizontal(&wheel, 1500);
+    		moveHorizontal(&baling, 1500);
     		xPesawat = 1300;
     		xWheel = 1240;
+    		xBaling = 1440;
     	}
+    	//printf("%d", xBaling);
 		
 		//check collide condition
 		if (isObjectCollide(pesawat, &M, c1) == 1) {
@@ -358,19 +389,21 @@ int main(){
 			int dx = 0;
 			int xtreamPoint = 550;
 			int isLanded=0;
+			int isBalingLanded=0;
 			int isBounced=0;
 			int isXtream;
 			while(xtreamPoint<670){
-				dx++;
-				moveHorizontal(&ledakan1,-3);
-				moveVertical(&ledakan1,((dx*dx)+2*dx)/1000);
-				
 				//fillMatrix(&M, xWheel, yWheel, WHITE);
 				if (!isLanded) {
-					moveVertical(&wheel, 10);
-					rotateWheelClockwise(&wheel, 15);
-
-					yWheel+=10;
+					moveVertical(&wheel, 5);
+					rotateWheelClockwise(&wheel, 5);
+					yWheel+=5;
+					
+					moveVertical(&baling, 5);
+					rotateClockwise(&baling, 5);
+					yBaling += 5;
+					
+					
 				}
 
 				if (isWheelOut(&wheel)) {
@@ -379,6 +412,7 @@ int main(){
 					isBounced=1;
 					isXtream=0;
 				}
+				
 				if (isBounced) {
 					wheelBounce(&wheel, xtreamPoint, &isXtream);
 
@@ -386,8 +420,16 @@ int main(){
 					if (!isXtream)
 						yWheel-=5;
 					else yWheel+=5;
+					
+					
+					moveHorizontal(&baling, 2);
+					rotateClockwise(&baling, 3);
+					xBaling += 2;
 				}
-
+				
+				dx++;
+				moveHorizontal(&ledakan1,-3);
+				moveVertical(&ledakan1,((dx*dx)+2*dx)/1000);
 				l1.x += -3;
 				l1.y +=((dx*dx)+2*dx)/1000;
 				rotateCounterClockwise(&ledakan1,15);
@@ -407,17 +449,28 @@ int main(){
 				rotateClockwise(&ledakan3,10);
 				// rotatePoint(&l3,550,110,10);
 
+				moveHorizontal(&lineBaling,5);
+				moveVertical(&lineBaling,((dx*dx)+2*dx)/1200);
+				rotateClockwise(&lineBaling, 5);
+
 				resetMatrix(&M);
+				gambarObject(lineBaling, &M, c5);
+				gambarObject(baling, &M, c4);
+				gambarObject(wheel, &M, c4);
 				gambarObject(meriam, &M, c3);
-				gambarObject(ledakan, &M, c4);
+				gambarObject(ledakan, &M, c3);
 				gambarObject(ledakan1, &M, c5);
 				gambarObject(ledakan2, &M, c5);
 				gambarObject(ledakan3, &M, c5);
-				gambarObject(wheel, &M, c3);
 				// fill (l1.x,l3.y,WHITE);
 				// fill (l2.x,l3.y,WHITE);
 				// fill (l3.x,l3.y,WHITE);
-				fillMatrix(&M, xWheel, yWheel, WHITE);
+				fillMatrix(&M, xBaling, yBaling, WHITE);
+				fillMatrix(&M, 550, 170, RED); // ledakan
+				fillMatrix(&M, 600, 690, RED); // meriam bawah
+				fillMatrix(&M, 600, 680, GREEN); // meriam atas
+				fillMatrix(&M, 600, 620, BLUE); // meriam persegi panjang
+				//fillMatrix(&M, xWheel, yWheel, WHITE);
 				for (y = 0; y < 700; y++) {
 					for (x = 0; x < 1200; x++) {
 						location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
@@ -446,19 +499,23 @@ int main(){
 				//fill (550, 170, RED);	// ledakan
 				
 			tim.tv_sec = 0;
-			tim.tv_nsec = 10000000;
-			nanosleep(&tim, NULL);
+			tim.tv_nsec = 5000000;
+			//tim.tv_nsec = 500000000;
+			//nanosleep(&tim, NULL);
 			}
 		}
 		//fill (600, 700, RED);	// meriam bawah
 		//fill (600, 680, GREEN);	// meriam atas
 		//fill (600, 620, BLUE);	// meriam persegi panjang
 		
-		tim.tv_sec = 0;
-		tim.tv_nsec = 100000000;
+		tim.tv_sec = 3;
+		tim.tv_nsec = 1000000000000;
 		//nanosleep(&tim, NULL);
 	} while (collide == 0);
-	fill(xWheel, yWheel, WHITE);
+	
+	
+	
+	//fill(xWheel, yWheel, WHITE);
     //closing connection
     end = 0;
     munmap(fbp, screensize);

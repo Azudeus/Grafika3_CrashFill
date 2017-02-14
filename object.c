@@ -85,6 +85,7 @@ int isWheelOut(Object* O) {
 	return 0;
 }
 
+
 void gambarObject(Object O, Matrix* M, char c) {
 	Point start, finish;
 	for(int i = 0;i < O.size-1 ;i++) {
@@ -229,6 +230,22 @@ Object makeLedakan(int xinit, int yinit) {
 	return O;
 }
 
+Object makeBaling(int xinit, int yinit) {
+	int x[12] = {-2, -7,  7,  2, 42, 42, 2,  7, -7,-2,-42,-42};
+	int y[12] = {-2,-42,-42, -2, -7,  7, 2, 42, 42, 2,  7, -7};
+	Object O;
+	for(int i = 0;i < 12;i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
+	}
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = 12;
+	O.nlingkaran = 0;
+	return O;
+}
+	
+
 Object makeMeriam(int xinitA, int yinitA) {
 	int x[4] = {13, 13, -13, -13};
 	int y[4] = {-117, -207, -207, -117};
@@ -287,3 +304,19 @@ void wheelBounce(Object* O, int xtreamPoint, int *isXtream) {
 		isXtream[0]=1;
 	}
 }
+
+Object makeLine(int xinit, int yinit) {
+	int x[2] = {-65, 0};
+	int y[2] = {  0, 0};
+	Object O;
+	for(int i = 0;i < 2;i++) {
+		O.P[i].x = x[i];
+		O.P[i].y = y[i];
+	}
+	O.pointInit.x = xinit;
+	O.pointInit.y = yinit;
+	O.size = 2;
+	O.nlingkaran = 0;
+	return O;
+}
+

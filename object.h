@@ -32,6 +32,8 @@ Object makeLedakan(int xinit, int yinit);
 Object makeLedakanPesawat1(int xinit, int yinit);
 Object makeLedakanPesawat2(int xinit, int yinit);
 Object makeLedakanPesawat3(int xinit, int yinit);
+Object makeBaling(int xinit, int yinit);
 Object makeMeriam(int xinitA, int yinitA);
 Object makeWheel(int, int);
+Object makeLine(int, int);
 #endif
