@@ -29,7 +29,7 @@ struct fb_fix_screeninfo finfo;
 long int screensize = 0;
 long location;
 struct timespec tim; 
-
+ 
 const int defXMeriam = 600;
 const int defXBullet = 600;
 
@@ -151,9 +151,9 @@ void *move_meriam(void *x_void_ptr) {
 	}
 }
 
+
 int main(){
    	int x = 0, y = 0;
-	
 	XMeriam = defXMeriam;
 	XBullet = defXBullet;
 	// Open the file for reading and writing
@@ -234,14 +234,12 @@ int main(){
 	
 	Object meriam = makeMeriam(XMeriam,750);
 	gambarObject(meriam, &M, c3);
-
-	Object wheel = makeWheel(980,102);
+	
 	gambarObject(pesawat, &M, c1);
-    gambarObject(meriam, &M, c3);
-    gambarObject(wheel, &M, c3);
+    
 //----------------------------------------------------------------------------------
 
-	x = 700; y = 1200;       // Where we are going to put the pixel
+	x = 1200; y = 700;       // Where we are going to put the pixel
 
 //---------------
 	for (y = 0; y < 700; y++) {
@@ -267,48 +265,35 @@ int main(){
 //---------------
 	int collide = 0;
 	int xPesawat = 1100;
-	int xWheel = 980;
-	int yWheel=110;
 	//the main display, game ends when bullet collides with plane
 	do {
-		moveHorizontal(&pesawat,-2);
-		moveHorizontal(&wheel, -2);
+		//newmeriam = makeMeriam(XMeriam,750);//testing
+		//meriam = newmeriam;
+		moveHorizontal(&pesawat,-10);
 		int j;
 		for (j = 0; j < nBullets; ++j) {
-			moveVertical(&bullets[j], -2);
-			yBullet[j] -=2;
+			moveVertical(&bullets[j], -15);
+			yBullet[j] -=15;
 		}
-		xWheel -= 2;
 		resetMatrix(&M);
 		gambarObject(pesawat, &M, c1);
-
+		
 		meriam = makeMeriam(XMeriam,750);
 	   	gambarObject(meriam, &M, c3);
-	   	gambarObject(wheel, &M, c3);
 	   	gambarObject(ledakan, &M, c4);
-		
 		for (j = 0; j < nBullets; ++j) {
 			gambarObject(bullets[j], &M, c2);
 		}
-		
-		
-		fillMatrix(&M, xPesawat, 100, BLUE);	// pesawat
-		fillMatrix(&M, xWheel, 125, WHITE);		// ban
 	   	for (y = 0; y < 700; y++) {
 			for (x = 0; x < 1200; x++) {
 				location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
 				(y+vinfo.yoffset) * finfo.line_length;
 
 				if (vinfo.bits_per_pixel == 32) {
-					if (M.M[y][x] == GREEN || M.M[y][x] == BLUE || M.M[y][x] == RED || M.M[y][x] == WHITE) {
-						fillColor(M.M[y][x]);
-					}
-					else { 
-						*(fbp + location) = M.M[y][x];        // Some blue
-						*(fbp + location + 1) = M.M[y][x]; //15+(x-100)/2;     // A little green
-						*(fbp + location + 2) = M.M[y][x]; //200-(y-100)/5;    // A lot of red
-						*(fbp + location + 3) = 0;      // No transparency
-					}
+					*(fbp + location) = M.M[y][x];        // Some blue
+					*(fbp + location + 1) = M.M[y][x]; //15+(x-100)/2;     // A little green
+					*(fbp + location + 2) = M.M[y][x]; //200-(y-100)/5;    // A lot of red
+					*(fbp + location + 3) = 0;      // No transparency
 				} else  { //assume 16bpp
 					int b = 10;
 					int g = (x-100)/6;     // A little green
@@ -323,26 +308,23 @@ int main(){
 			//fill(600,yBullet[j],WHITE);
 		}
 
-		xPesawat -= 2;
+		xPesawat -= 10;
 		//fill (xPesawat, 100, BLUE); // pesawat
-		//fill (xWheel, 125, WHITE);
 		
 		//check if plane is out of screen
 		if (isOut(&pesawat,-300,0)){
     		moveHorizontal(&pesawat,1500);
-    		moveHorizontal(&wheel, 1500);
     		xPesawat = 1300;
-    		xWheel = 1240;
     	}
 		
 		//check collide condition
 		if (isObjectCollide(pesawat, &M, c1) == 1) {
-			ledakan = makeLedakan(550,100);
+			int XLedakan = pesawat.pointInit.x;
+			ledakan = makeLedakan(XLedakan+30,100);
 			pesawat = makePesawat(1500,100);
-			ledakan1 = makeLedakanPesawat1(550,100);
-			ledakan2 = makeLedakanPesawat2(550,100);
-			ledakan3 = makeLedakanPesawat3(550,110);
-
+			ledakan1 = makeLedakanPesawat1(XLedakan,100);
+			ledakan2 = makeLedakanPesawat2(XLedakan,100);
+			ledakan3 = makeLedakanPesawat3(XLedakan,110);
 			collide = 1;
 
 			Point l1;
@@ -356,38 +338,10 @@ int main(){
 			l3.y = 100;
 
 			int dx = 0;
-			int xtreamPoint = 550;
-			int isLanded=0;
-			int isBounced=0;
-			int isXtream;
-			while(xtreamPoint<670){
+			while(isOut(&ledakan2,0,1000)){
 				dx++;
 				moveHorizontal(&ledakan1,-3);
 				moveVertical(&ledakan1,((dx*dx)+2*dx)/1000);
-				
-				//fillMatrix(&M, xWheel, yWheel, WHITE);
-				if (!isLanded) {
-					moveVertical(&wheel, 10);
-					rotateWheelClockwise(&wheel, 15);
-
-					yWheel+=10;
-				}
-
-				if (isWheelOut(&wheel)) {
-					xtreamPoint+=14;
-					isLanded=1;
-					isBounced=1;
-					isXtream=0;
-				}
-				if (isBounced) {
-					wheelBounce(&wheel, xtreamPoint, &isXtream);
-
-					xWheel+=3;
-					if (!isXtream)
-						yWheel-=5;
-					else yWheel+=5;
-				}
-
 				l1.x += -3;
 				l1.y +=((dx*dx)+2*dx)/1000;
 				rotateCounterClockwise(&ledakan1,15);
@@ -413,26 +367,20 @@ int main(){
 				gambarObject(ledakan1, &M, c5);
 				gambarObject(ledakan2, &M, c5);
 				gambarObject(ledakan3, &M, c5);
-				gambarObject(wheel, &M, c3);
 				// fill (l1.x,l3.y,WHITE);
 				// fill (l2.x,l3.y,WHITE);
 				// fill (l3.x,l3.y,WHITE);
-				fillMatrix(&M, xWheel, yWheel, WHITE);
+
 				for (y = 0; y < 700; y++) {
 					for (x = 0; x < 1200; x++) {
 						location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
 								   (y+vinfo.yoffset) * finfo.line_length;
 
 						if (vinfo.bits_per_pixel == 32) {
-							if (M.M[y][x] == GREEN || M.M[y][x] == BLUE || M.M[y][x] == RED || M.M[y][x] == WHITE) {
-								fillColor(M.M[y][x]);
-							}
-							else { 
-								*(fbp + location) = M.M[y][x];        // Some blue
-								*(fbp + location + 1) = M.M[y][x]; //15+(x-100)/2;     // A little green
-								*(fbp + location + 2) = M.M[y][x]; //200-(y-100)/5;    // A lot of red
-								*(fbp + location + 3) = 0;      // No transparency
-							}
+							*(fbp + location) = M.M[y][x];        // Some blue
+							*(fbp + location + 1) = M.M[y][x]; //15+(x-100)/2;     // A little green
+							*(fbp + location + 2) = M.M[y][x]; //200-(y-100)/5;    // A lot of red
+							*(fbp + location + 3) = 0;      // No transparency
 						} else  { //assume 16bpp
 							int b = 10;
 							int g = (x-100)/6;     // A little green
@@ -442,7 +390,6 @@ int main(){
 						}
 					}
 				}
-				
 				//fill (550, 170, RED);	// ledakan
 				
 			tim.tv_sec = 0;
@@ -456,9 +403,9 @@ int main(){
 		
 		tim.tv_sec = 0;
 		tim.tv_nsec = 100000000;
-		//nanosleep(&tim, NULL);
+		nanosleep(&tim, NULL);
 	} while (collide == 0);
-	fill(xWheel, yWheel, WHITE);
+
     //closing connection
     end = 0;
     munmap(fbp, screensize);
