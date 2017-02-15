@@ -23,4 +23,3 @@ int absolute(int n) {
 		return n;
 	}	
 }
-

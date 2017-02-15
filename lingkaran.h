@@ -15,5 +15,4 @@ void gambarLingkaran(Lingkaran* L, Matrix* M, char c, int penuh);
 //Mengembalikan 1 jika ada bagian yang tertimpa karakter lain
 int isLingkaranPutus(Lingkaran* L, Matrix* M, char c);
 
-
 #endif

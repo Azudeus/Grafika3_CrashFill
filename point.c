@@ -56,8 +56,6 @@ int isGarisPutus(Point P1, Point P2, Matrix* M, char c) {
 	return ret;
 }
 
-
-
 void setXY(Point* P, int x, int y) {
 	P->x = x;
 	P->y = y;

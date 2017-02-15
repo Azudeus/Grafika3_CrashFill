@@ -13,6 +13,6 @@ void gambarGaris(Point P1, Point P2, Matrix* M, char c);
 int isGarisPutus(Point P1, Point P2, Matrix* M, char c);
 void setXY(Point* P, int x, int y);
 void plotXY(Matrix* M, int x, int y, char c);
-
 void rotatePoint(Point* P, int initx, int inity, int x);
+
 #endif

@@ -70,7 +70,6 @@ void rotateCounterClockwise(Object* O, int x) {
 	}
 }
 
-
 int isOut(Object* O,float rangex, float rangey) {
 	if ((O->pointInit.x<=rangex)||(O->pointInit.y<=rangey)){
 		return 1;
@@ -81,10 +80,8 @@ int isOut(Object* O,float rangex, float rangey) {
 
 int isWheelOut(Object* O) {
 	if (O->pointInit.y>=650) return 1;
-	// printf("%d\n", (int)O->pointInit);
 	return 0;
 }
-
 
 void gambarObject(Object O, Matrix* M, char c) {
 	Point start, finish;
@@ -212,8 +209,6 @@ Object makeLedakanPesawat3(int xinit, int yinit) {
 	return O;
 }
 
-
-
 Object makeLedakan(int xinit, int yinit) {
 	int x[20] = {0, 20, 46, 40, 84, 54, 86, 51, 72, 29, 28, 4, -34, -19, -60, -22, -67, -21, -47, -4};
 	int y[20] = {0, 54, -2, 61, 39, 86, 96, 107, 145, 116, 148, 112, 117, 103, 107, 79, 64, 56, 8, 49};
@@ -245,7 +240,6 @@ Object makeBaling(int xinit, int yinit) {
 	return O;
 }
 	
-
 Object makeMeriam(int xinitA, int yinitA) {
 	int x[4] = {13, 13, -13, -13};
 	int y[4] = {-117, -207, -207, -117};
@@ -293,7 +287,6 @@ Object makeWheel(int xinit, int yinit) {
 }
 
 void wheelBounce(Object* O, int xtreamPoint, int *isXtream) {
-	// printf("%d %d \n", xtreamPoint, (int)O->pointInit.y);
 	rotateWheelClockwise(O, 5);
 	if (O->pointInit.y > xtreamPoint && !isXtream[0]) {
 		moveHorizontal(O, 3);
