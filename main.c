@@ -12,12 +12,15 @@
 #include "object.h"
 #include <stdio.h>
 #include <pthread.h>
+#include <termios.h>
 
+static struct termios oldt;
 char c;
 int end = 1;
 int nBullets = 0;
 Object bullets[20];
 int yBullet[20];
+int xBullet[20];
  
 char *fbp = 0;
 int fbfd = 0;
@@ -25,6 +28,8 @@ struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
 long int screensize = 0;
 long location;
+int dxMeriam=0;
+int xMeriam = 600;
 
 #define RED 1
 #define BLACK 2
@@ -75,8 +80,9 @@ void *get_keypress(void *x_void_ptr)
 void *make_bullets(void *x_void_ptr) {
 	while (end == 1) {
 		if (c == '\n') {
-			bullets[nBullets] = makePeluru(600,500);
+			bullets[nBullets] = makePeluru(xMeriam,500);
 			yBullet[nBullets] = 510;
+			xBullet[nBullets] = xMeriam;
 			++nBullets;
 			if (nBullets >= 19) {
 				nBullets = 0;
@@ -84,6 +90,36 @@ void *make_bullets(void *x_void_ptr) {
 			c = 'p';
 		}
 	}
+}
+
+void *geserMeriam(void *x_void_ptr) {
+	while (end==1) {
+		if (c == 'a') {
+			dxMeriam=-10;
+			c = 'p';
+		}
+		else if (c == 'd') {
+			dxMeriam=10;
+			c = 'p';
+		}
+	}
+}
+
+void restore_terminal_settings(void)
+{
+    tcsetattr(0, TCSANOW, &oldt);  /* Apply saved settings */
+}
+
+void disable_waiting_for_enter(void)
+{
+    struct termios newt;
+
+    /* Make terminal read 1 char at a time */
+    tcgetattr(0, &oldt);  /* Save terminal settings */
+    newt = oldt;  /* Init new settings */
+    newt.c_lflag &= ~(ICANON | ECHO);  /* Change settings */
+    tcsetattr(0, TCSANOW, &newt);  /* Apply settings */
+    atexit(restore_terminal_settings); /* Make sure settings will be restored when program ends  */
 }
 
 int main(){
@@ -123,7 +159,7 @@ int main(){
     }
     printf("The framebuffer device was mapped to memory successfully.\n");
 
-	pthread_t thread_keypress, thread_bullet;
+	pthread_t thread_keypress, thread_bullet, thread_seekCannon;
 
 	if(pthread_create(&thread_keypress, NULL, get_keypress, NULL)) {
 		fprintf(stderr, "Error creating thread\n");
@@ -135,6 +171,10 @@ int main(){
 		return 1;
 	}
 
+	if (pthread_create(&thread_seekCannon, NULL, geserMeriam, NULL)) {
+		fprintf(stderr, "Error creating thread 3\n");
+		return 1;
+	}
 	Matrix M;
 	Point P1, P2;
 	Lingkaran L;
@@ -151,7 +191,7 @@ int main(){
 	Object ledakan1;
 	Object ledakan2;
 	Object ledakan3 = makeLedakanPesawat3(500,100);
-	Object meriam = makeMeriam(600,750);
+	Object meriam = makeMeriam(xMeriam,750);
 	Object wheel = makeWheel(980,102);
     Object lineBaling = makeLine(1185, 100);
     Object baling = makeBaling(1189, 100);
@@ -191,11 +231,13 @@ int main(){
     int yBaling = 100;
 
 	do {
+		disable_waiting_for_enter();
 		moveHorizontal(&pesawat,-2);
 		moveHorizontal(&wheel, -2);
 		moveHorizontal(&baling, -2);
 		moveHorizontal(&lineBaling, -2);
 		rotateClockwise(&baling, 2);
+
 		for (int j = 0; j < nBullets; ++j) {
 			moveVertical(&bullets[j], -2);
 			yBullet[j] -=2;
@@ -207,22 +249,27 @@ int main(){
 	   	gambarObject(wheel, &M, c4);
 	   	gambarObject(lineBaling, &M, c4);
 		gambarObject(baling, &M, c1);
+
 		for (int j = 0; j < nBullets; ++j) {
 			gambarObject(bullets[j], &M, c2);
-			fillMatrix(&M, 600, yBullet[j], WHITE);
+			fillMatrix(&M, xBullet[j], yBullet[j], WHITE);
 		}
 		
+		moveHorizontal(&meriam, dxMeriam);		
 		xWheel -= 2;
 		xBaling -= 2;
 		xPesawat -= 2;
-		
+		xMeriam = meriam.pointInit.x;
+
 		fillMatrix(&M, xBaling, yBaling, RED);
-		fillMatrix(&M, 600, 690, RED); 			// meriam bawah
-		fillMatrix(&M, 600, 680, GREEN); 		// meriam atas
-		fillMatrix(&M, 600, 620, BLUE); 		// meriam persegi panjang
+		fillMatrix(&M, meriam.pointInit.x, 690, RED); 			// meriam bawah
+		fillMatrix(&M, meriam.pointInit.x, 680, GREEN); 		// meriam atas
+		fillMatrix(&M, meriam.pointInit.x, 620, BLUE); 		// meriam persegi panjang
 		fillMatrix(&M, xPesawat, 100, BLUE);
 		fillMatrix(&M, xWheel, 125, WHITE);
 		
+		dxMeriam = 0;
+
 	   	for (y = 0; y < 700; y++) {
 			for (x = 0; x < 1200; x++) {
 				location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
@@ -364,9 +411,9 @@ int main(){
 				fillMatrix(&M, l2.x, l2.y, BLUE);
 				fillMatrix(&M, l3.x, l3.y, BLUE);
 				fillMatrix(&M, 550, 170, RED); 		// ledakan
-				fillMatrix(&M, 600, 690, RED); 		// meriam bawah
-				fillMatrix(&M, 600, 680, GREEN); 	// meriam atas
-				fillMatrix(&M, 600, 620, BLUE); 	// meriam persegi panjang
+				fillMatrix(&M, xMeriam, 690, RED); 		// meriam bawah
+				fillMatrix(&M, xMeriam, 680, GREEN); 	// meriam atas
+				fillMatrix(&M, xMeriam, 620, BLUE); 	// meriam persegi panjang
 				fillMatrix(&M, xWheel, yWheel, WHITE);
 				fillMatrix(&M, xPesawat+100, yParasut, GREEN);
 
@@ -409,6 +456,9 @@ int main(){
 	if(pthread_join(thread_bullet, NULL)) {
 		fprintf(stderr, "Error joining thread 2\n");
 		return 2;
+	}
+	if (pthread_join(thread_seekCannon,NULL)) {
+		fprintf(stderr, "Error joining thread 3\n");
 	}
     return 0;
 }
