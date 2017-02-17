@@ -31,6 +31,11 @@ long location;
 int dxMeriam=0;
 int xMeriam = 600;
 
+int clxstart;
+int clystart;
+int clxend;
+int clyend;
+
 #define RED 1
 #define BLACK 2
 #define WHITE 3
@@ -124,6 +129,11 @@ void disable_waiting_for_enter(void)
 
 int main(){
    	int x = 0, y = 0;
+
+   	scanf("%d \n",&clxstart);
+   	scanf("%d \n",&clxend);
+   	scanf("%d \n",&clystart);
+   	scanf("%d",&clyend);
 	
 	// Open the file for reading and writing
     fbfd = open("/dev/fb0", O_RDWR);
@@ -203,8 +213,8 @@ int main(){
     gambarObject(baling, &M, c1);
     gambarObject(ledakan3,&M,c4);
     
-	for (y = 0; y < 700; y++) {
-        for (x = 0; x < 1200; x++) {
+	for (y = clystart; y < clyend; y++) {
+        for (x = clxstart; x < clyend; x++) {
             location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
                        (y+vinfo.yoffset) * finfo.line_length;
 
@@ -222,6 +232,8 @@ int main(){
             }
         }
     }
+
+    // sleep(5);
 
 	int collide = 0;
 	int xPesawat = 1100;
@@ -270,8 +282,8 @@ int main(){
 		
 		dxMeriam = 0;
 
-	   	for (y = 0; y < 700; y++) {
-			for (x = 0; x < 1200; x++) {
+	   	for (y = clystart; y < clyend; y++) {
+			for (x = clxstart; x < clxend; x++) {
 				location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
 				(y+vinfo.yoffset) * finfo.line_length;
 
@@ -417,8 +429,8 @@ int main(){
 				fillMatrix(&M, xWheel, yWheel, WHITE);
 				fillMatrix(&M, xPesawat+100, yParasut, GREEN);
 
-				for (y = 0; y < 700; y++) {
-					for (x = 0; x < 1200; x++) {
+				for (y = clystart; y < clyend; y++) {
+					for (x = clxstart; x < clxend; x++) {
 						location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
 								   (y+vinfo.yoffset) * finfo.line_length;
 
