@@ -78,7 +78,7 @@ void fillColor(int color) {
 void *get_keypress(void *x_void_ptr)
 {
 	while (end == 1) {
-		c = getchar();
+		c=getchar();
 	}
 }
 
@@ -130,11 +130,15 @@ void disable_waiting_for_enter(void)
 int main(){
    	int x = 0, y = 0;
 
-   	scanf("%d \n",&clxstart);
-   	scanf("%d \n",&clxend);
-   	scanf("%d \n",&clystart);
+   	printf("Enter Clip X Start Position: ");
+   	scanf("%d",&clxstart);
+   	printf("Enter Clip X End Position: ");
+   	scanf("%d",&clxend);
+   	printf("Enter Clip Y Start Position: ");
+   	scanf("%d",&clystart);
+   	printf("Enter Clip Y End Position: ");
    	scanf("%d",&clyend);
-	
+
 	// Open the file for reading and writing
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd == -1) {
@@ -251,8 +255,8 @@ int main(){
 		rotateClockwise(&baling, 2);
 
 		for (int j = 0; j < nBullets; ++j) {
-			moveVertical(&bullets[j], -2);
-			yBullet[j] -=2;
+			moveVertical(&bullets[j], -5);
+			yBullet[j] -=5;
 		}
 
 		resetMatrix(&M);
